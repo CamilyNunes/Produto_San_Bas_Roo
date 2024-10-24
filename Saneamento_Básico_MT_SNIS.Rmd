@@ -136,7 +136,9 @@ interactive_plot <- ggplotly(gg)
 # 7. Mostrar o gráfico interativo
 interactive_plot
 ```
-  
+   
+
+     
 # EVOLUCAO TEMPORAL DO INDICADOR NO ESTADO DE MT
 
 ## 8. Extração da variável de interesse
