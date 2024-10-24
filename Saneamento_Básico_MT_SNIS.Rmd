@@ -70,6 +70,11 @@ san <- san_mt[,c(1:10)]
   
 ```{r}
 san$pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+```
+    
+    
+```{r}
+san$pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
 
 san$consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
 
