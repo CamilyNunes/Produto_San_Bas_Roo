@@ -67,11 +67,6 @@ san <- san_mt[,c(1:10)]
   
 ```{r}
 san$pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
-```
-    
-    
-```{r}
-san$pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
 
 san$consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
 
@@ -82,21 +77,6 @@ san$índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratament
 san$volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
 ```
 
-```{r}
-#Converter as colunas para numérico, removendo possíveis caracteres  
-san <- san %>%
-  mutate(
-    índice_tratamento_esgoto_percentual = coalesce(as.numeric(as.character(índice_tratamento_esgoto_percentual)), 
-                                                    as.numeric(as.character(índice_tratamento_esgoto_percentual))),
-    volume_esgoto_coletado_m3 = coalesce(as.numeric(as.character(volume_esgoto_coletado_m3)), 
-                                          as.numeric(as.character(volume_esgoto_coletado_m3))),
-    índice_coleta_esgoto = coalesce(as.numeric(as.character(índice_coleta_esgoto)), 
-                                     as.numeric(as.character(índice_coleta_esgoto))),
-    consumo_agua_percapita = coalesce(as.numeric(as.character(consumo_agua_percapita)), 
-                                       as.numeric(as.character(consumo_agua_percapita)))
-  )
-```  
-  
 ## 7. Gráfico de mapa de valores ausentes (missing values)
 ```{r}
 # 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
@@ -143,8 +123,8 @@ gg <- ggplot(plot_data, aes(x = Proporcao,
                     labels = c("Valores Presentes", "Valores Omissos")) +
   theme_minimal() + 
   theme(
-    axis.title.x = element_text(size = 10, face = "bold", color = "black"),
-    axis.title.y = element_text(size = 10, face = "bold", color = "black", angle = 90),
+    axis.title.x = element_text(size = 1.5, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 1.5, face = "bold", color = "black", angle = 90),
     plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
     plot.subtitle = element_text(size = 12, hjust = 0.5),
     panel.grid.major = element_line(color = "grey85"),
@@ -157,7 +137,6 @@ interactive_plot <- ggplotly(gg)
 interactive_plot
 ```
   
-
 # EVOLUCAO TEMPORAL DO INDICADOR NO ESTADO DE MT
 
 ## 8. Extração da variável de interesse
