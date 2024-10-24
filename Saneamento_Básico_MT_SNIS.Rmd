@@ -1,0 +1,312 @@
+---
+title: "Relatório de Saneamento Básico"
+author: "Camily Nunes dos Santos"
+output:
+  html_document:
+    toc: true
+---
+
+# Objetivo Final
+Explorar e pensar em como utilizar os dados do SNIS no relatório.
+
+# 1. Preparar o ambiente de trabalho
+
+Criar uma pasta de trabalho: O código começa configurando o diretório de trabalho, onde estarão os arquivos de dados e onde os resultados serão salvos.
+
+Dica: Session \> Set Working Directory \> Choose Directory
+
+## 2. Instalar e carregar pacotes
+
+Instalar os pacotes (se necessário): Caso os pacotes ainda não estejam instalados, você pode instalar com os comandos abaixo:
+
+```{r}
+# Lista de pacotes necessários
+pacotes <- c("ggplot2", "dplyr", "tidyr", "plotly", "readr")
+```
+
+```{r}
+# Instalar os pacotes que ainda não estão instalados
+pacotes_nao_instalados <- pacotes[!(pacotes %in% installed.packages()[,"Package"])]
+if(length(pacotes_nao_instalados)) install.packages(pacotes_nao_instalados)
+
+# Carregar os pacotes, verificar se falha
+invisible(lapply(pacotes, function(pkg) {
+  if (!require(pkg, character.only = TRUE)) {
+    stop(paste("Falha ao carregar o pacote:", pkg))
+  }
+}))
+
+```
+
+## 
+
+## 3. Carregar os dados    
+ 
+```{r}
+url <- "https://github.com/CamilyNunes/dados-snis-mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/AgregadoSNISMT.csv"
+```
+   
+```{r}
+san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
+```
+
+## 
+
+## 4. Desabilitar notação científica
+
+Para garantir que os números não sejam representados em notação científica:
+
+```{r}
+options(scipen = 999) 
+```
+
+## 6. Tratar os dados do SNIS  
+
+Selecionar colunas de interesse:
+```{r}
+# selecionar variaveis de referencia
+san <- san_mt[,c(1:10)]
+```
+  
+```{r}
+san$pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+
+san$consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
+
+san$índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
+
+san$índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
+
+san$volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
+```
+
+```{r}
+#Converter as colunas para numérico, removendo possíveis caracteres  
+san <- san %>%
+  mutate(
+    índice_tratamento_esgoto_percentual = coalesce(as.numeric(as.character(índice_tratamento_esgoto_percentual)), 
+                                                    as.numeric(as.character(índice_tratamento_esgoto_percentual))),
+    volume_esgoto_coletado_m3 = coalesce(as.numeric(as.character(volume_esgoto_coletado_m3)), 
+                                          as.numeric(as.character(volume_esgoto_coletado_m3))),
+    índice_coleta_esgoto = coalesce(as.numeric(as.character(índice_coleta_esgoto)), 
+                                     as.numeric(as.character(índice_coleta_esgoto))),
+    consumo_agua_percapita = coalesce(as.numeric(as.character(consumo_agua_percapita)), 
+                                       as.numeric(as.character(consumo_agua_percapita)))
+  )
+```  
+  
+## 7. Gráfico de mapa de valores ausentes (missing values)
+```{r}
+# 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
+calc_missing_proportion <- function(df) {
+  missing_data <- sapply(df, function(col) {
+    mean(is.na(col))
+  })
+  
+  missing_df <- data.frame(
+    Atributo = names(missing_data),
+    ProporcaoOmissos = missing_data)
+  
+  missing_df <- missing_df %>%
+    filter(ProporcaoOmissos > 0)
+  
+  return(missing_df)
+}
+
+# 2. Calcular a proporção de valores omissos no conjunto de dados 'san'
+missing_proportions <- calc_missing_proportion(san)
+
+# 3. Preparar os dados para a plotagem em forma de gráfico de barra empilhada
+plot_data <- missing_proportions %>%
+  mutate(Presentes = 1 - ProporcaoOmissos) %>%
+  pivot_longer(cols = c(ProporcaoOmissos, Presentes), 
+               names_to = "Status", 
+               values_to = "Proporcao")
+
+# 4. Definir as cores de acordo com seu Tema dos Gráficos
+cor_omisso <- "#FF6347"
+cor_presente <- "#006400"
+
+# 5. Criar o gráfico de coluna empilhada em 100% e inverter os eixos
+gg <- ggplot(plot_data, aes(x = Proporcao, 
+                             y = Atributo, 
+                             fill = Status)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_x_continuous(labels = scales::percent) +
+  labs(
+    title = "Proporção de Valores Omissos por Atributo",
+    x = "Proporção (%)",
+    y = "Atributos") +
+  scale_fill_manual(values = c("ProporcaoOmissos" = cor_omisso, "Presentes" = cor_presente), 
+                    labels = c("Valores Presentes", "Valores Omissos")) +
+  theme_minimal() + 
+  theme(
+    axis.title.x = element_text(size = 10, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 10, face = "bold", color = "black", angle = 90),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    panel.grid.major = element_line(color = "grey85"),
+    panel.grid.minor = element_blank())
+
+# 6. Converter o gráfico ggplot em um gráfico interativo com plotly
+interactive_plot <- ggplotly(gg)
+
+# 7. Mostrar o gráfico interativo
+interactive_plot
+```
+  
+
+# EVOLUCAO TEMPORAL DO INDICADOR NO ESTADO DE MT
+
+## 8. Extração da variável de interesse
+
+A variável 'datavar' contém o consumo per capita de água em litros por habitante por dia.
+
+```{r}
+datavar = san$consumo_agua_percapita
+```
+
+## 9. Armazenamento do dataset completo
+
+A variável 'data' recebe o dataset 'san' completo. \# Isso permite o uso de todos os dados na análise subsequente.
+
+```{r}
+data = san
+```
+
+## 10. Definição da legenda para gráficos
+
+Define a legenda para as visualizações que utilizam a variável 'datavar'. A legenda indica que a variável representa o "Consumo Percapita de Água" em litros por habitante por dia.
+
+```{r}
+legendavar = 'Consumo Percapita de Água (1/hab/dia)'
+```
+  
+```{r}
+chave = 'media'
+```
+
+      
+
+## 10. Funções de suporte para gráficos
+
+```{r}
+# Função para limpar strings, removendo espaços, caracteres especiais e acentos
+cleanStr <- function(string) {
+  
+  # Carregar pacotes necessários apenas uma vez
+  if (!require(stringi)) install.packages("stringi", quietly = TRUE)
+  if (!require(stringr)) install.packages("stringr", quietly = TRUE)
+  
+  # Limpar e normalizar a string
+  string <- str_replace_all(string, ' ', '_')
+  string <- str_replace_all(string, '-', '_')
+  string <- str_replace_all(string, '%', '')
+  string <- str_replace_all(string, '/', '_')
+  string <- stri_trans_general(string, "latin-ascii")
+  string <- tolower(string)
+  
+  return(string)
+}
+```
+
+## 5. Definir tema personalizado para gráficos (ggplot2)
+
+```{r}
+#Definindo gráfico
+tema_plot <- function(dataTime, legendavar, chave) {
+  
+  # Criar gráfico básico de linha com o tema minimalista
+  plot <- ggplot(data = dataTime, aes(x = tempo, y = x, group = 1)) +
+            geom_line(color = "#006400", size = 1.2) +  # Linha na cor verde-escura
+            geom_label(aes(label = label), size = 3, color = "#006400") +  # Rótulos em verde-escuro
+            labs(
+              title = "Evolução Temporal do Indicador no Estado de MT",
+              subtitle = legendavar,
+              x = "Ano",  # Legenda para o eixo X
+              y = legendavar  # Legenda para o eixo Y
+            ) +
+            scale_x_continuous(
+            breaks = seq(from = min(dataTime$tempo), to = max(dataTime$tempo), by = 1),
+              limits = c(min(dataTime$tempo), max(dataTime$tempo)),
+              expand = c(0, 0)  # Remover margens extras
+              ) +
+            scale_color_distiller(palette = "Greens", direction = 1) +  # Paleta de cores Greens
+            theme_minimal() %+replace%  # Manter um tema minimalista com os eixos
+            theme(
+              axis.title.x = element_text(size = 10, face = "bold", color = "black"),  # Legenda do eixo X
+              axis.title.y = element_text(size = 10, face = "bold", color = "black", angle = 90),  # Legenda Y na vertical
+              axis.text.x = element_text(size = 10, angle = 45, hjust = 1),  # Texto do eixo X com rotação
+              axis.text.y = element_text(size = 10),  # Texto do eixo Y
+              plot.title = element_text(size = 14, face = "bold", hjust = 0.5),  # Título centralizado
+              plot.subtitle = element_text(size = 12, hjust = 0.5),  # Subtítulo centralizado
+              panel.grid.major = element_line(color = "grey85"),  # Linhas de grid principais
+              panel.grid.minor = element_blank(),  # Remover grid secundário
+              legend.position = "none"  # Sem legenda adicional
+            )
+  
+  # Agregar escala Y caso solicitado
+  if (chave == 'agregar') {
+    plot <- plot + scale_y_continuous(breaks = c(min(dataTime$x), mean(dataTime$x), max(dataTime$x)))
+  }
+  
+  # Salvar o gráfico em um arquivo PNG
+  ggsave(
+    filename = paste0('tempo_', cleanStr(legendavar), '.png'), 
+    plot = plot, 
+    path = 'resultados',
+    width = 8,
+    height = 4,
+    units = 'in')
+  
+  # Converta o gráfico ggplot em um gráfico interativo
+  plot_interativo <- ggplotly(plot)
+  
+  return(plot_interativo)
+}
+```
+
+```{r}
+dev01 <- function(data, datavar, chave, legendavar) {
+  
+  if (chave == 'agregar') {
+    # agregar valores
+    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = sum)
+  } else if (chave == 'media') {
+    # tirar media valores
+    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = mean)
+    dataTime$x = round(dataTime$x, 2)
+  } else {
+    stop("Chave não encontrada! Tente 'agregar' ou 'media'.")
+  }
+  
+  # label
+  dataTime$label <- NA
+  n <- min(5, nrow(dataTime)) #Seleciona no máximo 5 pontos
+  idx <- seq(1, nrow(dataTime), length.out = n)
+  dataTime$label[idx] <- dataTime$x[idx]
+  
+  # A coluna 'x' precisa ser definida aqui
+  colnames(dataTime)[2] <- "x"  # Renomeia a coluna para 'x'
+  
+  # gráfico
+  plot = tema_plot(dataTime, legendavar, chave)
+  return(plot)
+}
+```
+
+#Processar dados e gerar gráficos com base em variáveis específicas de um conjunto de dados.
+```{r}
+# executar funcao
+dev01(san, san$pop_atendida_abas_agua, 'agregar','Pop. com Abastecimento de Água')
+
+dev01(san, san$consumo_agua_percapita, 'media','Consumo Percapita de Água (l-hab-dia)')
+
+dev01(san, san$índice_coleta_esgoto, 'media','Índice de Coleta de Esgoto')
+
+dev01(san, san$índice_tratamento_esgoto_percentual, 'media','Índice Tratamento de Esgoto')
+
+dev01(san, san$volume_esgoto_coletado_m3, 'agregar','Volume Esgoto Coletado (m³)' )
+```
+
+

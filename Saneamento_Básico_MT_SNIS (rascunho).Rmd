@@ -1,0 +1,26 @@
+---
+title: "RAscunho"
+author: "Camily Nunes dos Santos"
+date: "2024-10-24"
+output: html_document
+---
+  
+  
+```{r}
+url <- "https://github.com/CamilyNunes/dados-snis-mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/AgregadoSNISMT(TESTE).csv"
+```
+  
+    
+
+  
+```{r} 
+url <- "https://github.com/CamilyNunes/dados-snis-mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/AgregadoSNISMT.csv"
+```
+     
+
+```{r}
+# Remove as linhas com valores ausentes
+san <- san[complete.cases(san),]
+```
+  
+    
