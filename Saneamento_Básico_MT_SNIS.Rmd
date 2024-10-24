@@ -43,7 +43,7 @@ invisible(lapply(pacotes, function(pkg) {
 ## 3. Carregar os dados    
  
 ```{r}
-url <- "https://github.com/CamilyNunes/dados-snis-mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/AgregadoSNISMT.csv"
+url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/AgregadoSNISMT.csv"
 ```
    
 ```{r}
