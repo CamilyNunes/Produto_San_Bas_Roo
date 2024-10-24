@@ -1,9 +1,6 @@
 ---
 title: "Relatório de Saneamento Básico"
 author: "Camily Nunes dos Santos"
-output:
-  html_document:
-    toc: true
 ---
 
 # Objetivo Final
