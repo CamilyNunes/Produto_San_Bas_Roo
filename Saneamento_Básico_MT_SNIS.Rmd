@@ -39,7 +39,7 @@ invisible(lapply(pacotes, function(pkg) {
 ## 3. Carregar os dados    
  
 ```{r}
-url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/AgregadoSNISMT.csv"
+url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/SNISMTAgregado.csv"
 ```
 
 ```{r}
@@ -74,13 +74,6 @@ san$índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
 san$índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
 
 san$volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
-```
-  
-```{r}
-# Tentar converter a coluna de tempo para numérico, removendo possíveis caracteres
-san$pop_atendida_abas_agua <- as.numeric(as.character(san$pop_atendida_abas_agua))
-
-san$índice_coleta_esgoto <- as.numeric(as.character(san$índice_coleta_esgoto))
 ```
     
     
@@ -176,7 +169,6 @@ legendavar = 'Consumo Percapita de Água (1/hab/dia)'
 chave = 'media'
 ```
 
-      
 
 ## 10. Funções de suporte para gráficos
 
@@ -237,7 +229,7 @@ tema_plot <- function(dataTime, legendavar, chave) {
   
   # Agregar escala Y caso solicitado
   if (chave == 'agregar') {
-    plot <- plot + scale_y_continuous(breaks = c(min(dataTime$x), mean(dataTime$x), max(dataTime$x)))
+    plot <- plot + scale_y_continuous(limits = range(dataTime$x, na.rm = TRUE))
   }
   
   # Salvar o gráfico em um arquivo PNG
@@ -288,15 +280,15 @@ dev01 <- function(data, datavar, chave, legendavar) {
 #Processar dados e gerar gráficos com base em variáveis específicas de um conjunto de dados.
 ```{r}
 # executar funcao
-dev01(san, san$pop_atendida_abas_agua, 'agregar','Pop. com Abastecimento de Água')
+dev01(san, san$pop_atendida_abas_agua, 'media','Pop. com Abastecimento de Água')
 
-dev01(san, san$consumo_agua_percapita, 'media','Consumo Percapita de Água (l-hab-dia)')
+dev01(san, san$consumo_agua_percapita, 'agregar','Consumo Percapita de Água (l-hab-dia)')
 
-dev01(san, san$índice_coleta_esgoto, 'media','Índice de Coleta de Esgoto')
+dev01(san, san$índice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
 
-dev01(san, san$índice_tratamento_esgoto_percentual, 'media','Índice Tratamento de Esgoto')
+dev01(san, san$índice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
 
-dev01(san, san$volume_esgoto_coletado_m3, 'agregar','Volume Esgoto Coletado (m³)')
+dev01(san, san$volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
 ```
 
-
+   
