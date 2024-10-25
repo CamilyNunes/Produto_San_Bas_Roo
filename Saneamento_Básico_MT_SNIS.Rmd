@@ -153,16 +153,15 @@ interactive_plot
 ```
 
 ```{r}
-# Remove as linhas com valores ausentes
-san <- san[complete.cases(san),]
-```
-
-```{r}
 #teste  
+library(dplyr)
 library(tidyr)
 
-san_mt <- san_mt %>% 
-  replace_na(list(across(everything(), ~ 0)))
+
+san <- san %>%
+  mutate(across(where(is.character), ~ na_if(., "NS"))) %>%  # Converte "NS" em NA apenas nas colunas de texto
+  mutate(across(where(is.numeric), ~ replace_na(., 0))) %>%  # Substitui NA por 0 nas colunas numéricas
+  mutate(across(where(is.character), ~ replace_na(., "0")))  # Substitui NA por "0" nas colunas de texto
 ```
 
 
@@ -317,3 +316,5 @@ dev01(san, san$índice_tratamento_esgoto_percentual, 'agregar','Índice Tratamen
 
 dev01(san, san$volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
 ```
+  
+  
