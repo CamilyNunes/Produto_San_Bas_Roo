@@ -10,13 +10,22 @@ output:
       position: "left"      # Posição
     theme: cosmo            # Tema Bootstrap para o HTML
     highlight: tango         # Destacar a sintaxe em R
-    css: "estilo.css"       # Arquivo CSS personalizado
+    css: "estilo.css"       # Arquivo CSS personalizado    
+    
+<!-- HTML para o logotipo -->
+<div class="header">
+  <div class="logo-container">
+    <img src="imagens_logo_ufr.png" alt="Logotipo UFR">
+  </div>
+  <h1>Relatório de Saneamento Básico</h1>
+  <p>Camily Nunes dos Santos</p>
+</div>
+
+<h2>Objetivo Final</h2> 
+      
 ---    
 
-<!-- HTML para o logotipo -->
-<div class="logo-container">
-  <img src="imagens/logo_ufr.png" alt="Logotipo UFR">
-</div>  
+
   
   
 # Objetivo Final

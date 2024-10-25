@@ -2,14 +2,14 @@
 
 /* Ajuste do tamanho do corpo do texto */
 body {
-  font-size: 12px; /* Tamanho do texto principal */
-  line-height: 1.5; /* Espaçamento entre linhas para maior legibilidade */
-  margin: 2cm 3cm;
+  font-size: 12pt; /* Tamanho do texto principal conforme ABNT */
+  line-height: 1.5; /* Espaçamento entre linhas conforme ABNT */
+  margin: 2cm 3cm; /* Margens recomendadas pela ABNT */
 }
 
 /* Tamanhos consistentes para cabeçalhos */
 h1 {
-  font-size: 20pt;
+  font-size: 20pt; /* Tamanho adequado para o título principal */
   font-weight: bold;
   text-align: center;
 }
@@ -41,13 +41,12 @@ table {
   overflow-x: auto;
   display: block;
 }  
-  
+
 /* Posiciona o logotipo no canto superior esquerdo */
 .logo-container {
   position: absolute;
-  top: 20px;
-  left: 20px;
-   z-index: 1000; /* Garante que o logotipo fique acima do título */
+  top: 0;
+  left: 0;
 }
 
 .logo-container img {
