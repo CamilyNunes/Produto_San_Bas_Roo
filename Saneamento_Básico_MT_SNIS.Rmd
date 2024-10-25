@@ -8,7 +8,12 @@ output:
       collapsed: false      # Expande o índice automaticamente
       smooth_scroll: true   # Rolagem suave ao clicar no índice
       position: "left"      # Posição à esquerda
----  
+    theme: cosmo            # Tema Bootstrap para o HTML
+    highlight: tango         # Destacar a sintaxe em R
+    css: "estilo.css"       # Arquivo CSS personalizado
+---    
+  
+![Logotipo UFR](imagens_logo_ufr.png){width=100px}
 
 # Objetivo Final
 
@@ -31,11 +36,11 @@ Criar uma pasta de trabalho: O código começa configurando o diretório de trab
 
 ### 2.1 Instalar Pacotes (se necessário):
 
-Caso os pacotes ainda não estejam instalados, você pode instalar com os comandos abaixo:
-
+Caso os pacotes ainda não estejam instalados, você pode instalar com os comandos abaixo:  
+  
 ```{r}
 # Lista de pacotes necessários
-pacotes <- c("ggplot2", "dplyr", "tidyr", "plotly", "readr")
+pacotes <- c("ggplot2", "dplyr", "tidyr", "plotly", "readr", "zoo")
 ```
 
 ```{r}
@@ -151,21 +156,18 @@ interactive_plot <- ggplotly(gg)
 # 7. Mostrar o gráfico interativo
 interactive_plot
 ```
-
   
+## 7. Aplicação do Método de Interpolação   
+
+  A interpolação é uma técnica usada para estimar valores desconhecidos dentro de um intervalo de dados conhecidos. Em séries temporais, a interpolação nos permite preencher valores ausentes com base nos valores antes e depois do ponto em falta, criando uma "ponte" entre os dados disponíveis. Isso é especialmente útil para manter a consistência dos dados e evitar problemas que poderiam surgir ao usar conjuntos de dados com muitas lacunas.
+
+    
 ```{r}
-#teste  
-library(dplyr)
-library(tidyr)
-
-
+# Aplicar interpolação linear nas variáveis numéricas
 san <- san %>%
-  mutate(across(where(is.character), ~ na_if(., "NS"))) %>%  # Converte "NS" em NA apenas nas colunas de texto
-  mutate(across(where(is.numeric), ~ replace_na(., 0))) %>%  # Substitui NA por 0 nas colunas numéricas
-  mutate(across(where(is.character), ~ replace_na(., "0")))  # Substitui NA por "0" nas colunas de texto
+  mutate(across(where(is.numeric), ~ na.approx(.)))
 ```
-  
-
+   
 # Evolução Temporal do Indicador no Estado de MT
 
 ## 1. Extração da Variável de Interesse
@@ -282,7 +284,7 @@ dev01 <- function(data, datavar, chave, legendavar) {
     dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = sum)
   } else if (chave == 'media') {
     # tirar media valores
-    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = sum)
+    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = mean)
     dataTime$x = round(dataTime$x, 2)
   } else {
     stop("Chave não encontrada! Tente 'agregar' ou 'media'.")
@@ -317,5 +319,6 @@ dev01(san, san$índice_tratamento_esgoto_percentual, 'agregar','Índice Tratamen
 
 dev01(san, san$volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
 ```
-  
-  
+     
+       
+       

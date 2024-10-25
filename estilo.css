@@ -1,0 +1,53 @@
+/* estilo.css */
+
+/* Ajuste do tamanho do corpo do texto */
+body {
+  font-size: 16px; /* Tamanho do texto principal */
+  line-height: 1.6; /* Espaçamento entre linhas para maior legibilidade */
+}
+
+/* Tamanhos consistentes para cabeçalhos */
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+h3 {
+  font-size: 1.6em;
+  font-weight: bold;
+}
+
+/* Margem inferior para cada cabeçalho */
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 10px;
+}
+  
+/* Imagens responsivas */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tabelas responsivas */
+table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}  
+  
+/* Posiciona o logotipo no canto superior esquerdo */
+.logo-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.logo-container img {
+  width: 100px; /* Ajusta o tamanho do logotipo */
+}
+

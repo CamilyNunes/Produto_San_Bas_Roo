@@ -31,3 +31,23 @@ san$pop_atendida_abas_agua <- as.numeric(as.character(san$pop_atendida_abas_agua
 san$índice_coleta_esgoto <- as.numeric(as.character(san$índice_coleta_esgoto))
 ```
   
+ 
+```{r}
+# Remove as linhas com valores ausentes
+san <- san[complete.cases(san),]
+```
+  
+      
+```{r}
+#teste 1 
+library(dplyr)
+library(tidyr)
+
+
+san <- san %>%
+  mutate(across(where(is.character), ~ na_if(., "NS"))) %>%  # Converte "NS" em NA apenas nas colunas de texto
+  mutate(across(where(is.numeric), ~ replace_na(., 0))) %>%  # Substitui NA por 0 nas colunas numéricas
+  mutate(across(where(is.character), ~ replace_na(., "0")))  # Substitui NA por "0" nas colunas de texto
+```
+     
+    
