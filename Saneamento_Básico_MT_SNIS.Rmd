@@ -152,6 +152,7 @@ interactive_plot <- ggplotly(gg)
 interactive_plot
 ```
 
+  
 ```{r}
 #teste  
 library(dplyr)
@@ -163,7 +164,7 @@ san <- san %>%
   mutate(across(where(is.numeric), ~ replace_na(., 0))) %>%  # Substitui NA por 0 nas colunas numéricas
   mutate(across(where(is.character), ~ replace_na(., "0")))  # Substitui NA por "0" nas colunas de texto
 ```
-
+  
 
 # Evolução Temporal do Indicador no Estado de MT
 
