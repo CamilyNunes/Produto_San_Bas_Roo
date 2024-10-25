@@ -7,17 +7,18 @@ output:
     toc_float: 
       collapsed: false      # Expande o índice automaticamente
       smooth_scroll: true   # Rolagem suave ao clicar no índice
-      position: "right"      # Posição à esquerda
+      position: "left"      # Posição
     theme: cosmo            # Tema Bootstrap para o HTML
     highlight: tango         # Destacar a sintaxe em R
     css: "estilo.css"       # Arquivo CSS personalizado
 ---    
 
-<!-- Logotipo posicionado no canto superior esquerdo -->
+<!-- HTML para o logotipo -->
 <div class="logo-container">
-  <img src="imagens_logo_ufr.png" alt="Logotipo UFR">
-</div> 
-
+  <img src="imagens/logo_ufr.png" alt="Logotipo UFR">
+</div>  
+  
+  
 # Objetivo Final
 
 O objetivo deste relatório é explorar e analisar os dados do Sistema Nacional de Informação sobre Saneamento (SNIS) para entender a situação do saneamento básico em Mato Grosso. Especificamente, buscamos:
