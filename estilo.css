@@ -43,11 +43,18 @@ table {
 /* Posiciona o logotipo no canto superior esquerdo */
 .logo-container {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 10px; /* Ajusta a altura do logotipo */
+  left: 10px; /* Ajusta a posição lateral do logotipo */
+  z-index: 1000; /* Garante que o logotipo fique acima do título */
 }
 
 .logo-container img {
   width: 100px; /* Ajusta o tamanho do logotipo */
 }
 
+/* Ajusta o índice para o canto superior direito */
+#toc {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+}
