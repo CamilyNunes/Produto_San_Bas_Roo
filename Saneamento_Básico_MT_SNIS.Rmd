@@ -32,7 +32,6 @@ invisible(lapply(pacotes, function(pkg) {
     stop(paste("Falha ao carregar o pacote:", pkg))
   }
 }))
-
 ```
 
 ## 
@@ -76,7 +75,15 @@ san$índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratament
 
 san$volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
 ```
+  
+```{r}
+# Tentar converter a coluna de tempo para numérico, removendo possíveis caracteres
+san$pop_atendida_abas_agua <- as.numeric(as.character(san$pop_atendida_abas_agua))
 
+san$índice_coleta_esgoto <- as.numeric(as.character(san$índice_coleta_esgoto))
+```
+    
+    
 ## 7. Gráfico de mapa de valores ausentes (missing values)
 ```{r}
 # 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
