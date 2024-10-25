@@ -157,7 +157,14 @@ interactive_plot
 san <- san[complete.cases(san),]
 ```
 
-´
+```{r}
+#teste  
+library(tidyr)
+
+san_mt <- san_mt %>% 
+  replace_na(list(across(everything(), ~ 0)))
+```
+
 
 # Evolução Temporal do Indicador no Estado de MT
 
