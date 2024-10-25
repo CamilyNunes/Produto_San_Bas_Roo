@@ -24,3 +24,10 @@ san <- san[complete.cases(san),]
 ```
   
     
+```{r}
+# Tentar converter a coluna de tempo para numérico, removendo possíveis caracteres
+san$pop_atendida_abas_agua <- as.numeric(as.character(san$pop_atendida_abas_agua))
+
+san$índice_coleta_esgoto <- as.numeric(as.character(san$índice_coleta_esgoto))
+```
+  

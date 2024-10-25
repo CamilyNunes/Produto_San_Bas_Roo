@@ -1,20 +1,37 @@
 ---
 title: "Relatório de Saneamento Básico"
-author: "Camily Nunes dos Santos"
----
+author: "Camily Nunes dos Santos"  
+output: 
+  html_document:
+    toc: true               # Ativa o índice
+    toc_float: 
+      collapsed: false      # Expande o índice automaticamente
+      smooth_scroll: true   # Rolagem suave ao clicar no índice
+      position: "left"      # Posição à esquerda
+---  
 
 # Objetivo Final
-Explorar e pensar em como utilizar os dados do SNIS no relatório.
 
-# 1. Preparar o ambiente de trabalho
+O objetivo deste relatório é explorar e analisar os dados do Sistema Nacional de Informação sobre Saneamento (SNIS) para entender a situação do saneamento básico em Mato Grosso. Especificamente, buscamos:
+
+-   **Avaliar a cobertura de serviços de água e esgoto**, analisando a evolução desses indicadores ao longo dos anos.
+-   **Identificar desigualdades regionais** no acesso a saneamento básico e suas implicações para a saúde pública.
+-   **Utilizar visualizações** e métodos estatísticos para apresentar os dados de maneira clara e acessível, facilitando a interpretação dos resultados.
+-   **Contribuir para a formulação de políticas públicas** eficazes, fundamentadas em evidências, que promovam melhorias no setor de saneamento.
+
+Com isso, esperamos que este relatório sirva como uma ferramenta útil para gestores públicos, pesquisadores e membros da sociedade civil, incentivando um debate informado sobre o tema.
+
+## 1. Preparar o Ambiente de Trabalho
 
 Criar uma pasta de trabalho: O código começa configurando o diretório de trabalho, onde estarão os arquivos de dados e onde os resultados serão salvos.
 
-Dica: Session \> Set Working Directory \> Choose Directory
+**Dica:** Vá para **Session \> Set Working Directory \> Choose Directory**.
 
-## 2. Instalar e carregar pacotes
+## 2. Instalar e Carregar Pacotes
 
-Instalar os pacotes (se necessário): Caso os pacotes ainda não estejam instalados, você pode instalar com os comandos abaixo:
+### 2.1 Instalar Pacotes (se necessário):
+
+Caso os pacotes ainda não estejam instalados, você pode instalar com os comandos abaixo:
 
 ```{r}
 # Lista de pacotes necessários
@@ -25,8 +42,11 @@ pacotes <- c("ggplot2", "dplyr", "tidyr", "plotly", "readr")
 # Instalar os pacotes que ainda não estão instalados
 pacotes_nao_instalados <- pacotes[!(pacotes %in% installed.packages()[,"Package"])]
 if(length(pacotes_nao_instalados)) install.packages(pacotes_nao_instalados)
+```
 
-# Carregar os pacotes, verificar se falha
+### 2.2 Carregar os Pacotes
+
+```{r}
 invisible(lapply(pacotes, function(pkg) {
   if (!require(pkg, character.only = TRUE)) {
     stop(paste("Falha ao carregar o pacote:", pkg))
@@ -34,21 +54,15 @@ invisible(lapply(pacotes, function(pkg) {
 }))
 ```
 
-## 
-
-## 3. Carregar os dados    
- 
-```{r}
-url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/SNISMTAgregado.csv"
-```
+## 3. Carregar os Dados
 
 ```{r}
+url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/SNISMTAgregado.csv"  
+
 san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
 ```
-  
-## 
 
-## 4. Desabilitar notação científica
+## 4. Desabilitar Notação Científica
 
 Para garantir que os números não sejam representados em notação científica:
 
@@ -56,14 +70,15 @@ Para garantir que os números não sejam representados em notação científica:
 options(scipen = 999) 
 ```
 
-## 6. Tratar os dados do SNIS  
+## 5. Tratar os Dados do SNIS
 
 Selecionar colunas de interesse:
+
 ```{r}
 # selecionar variaveis de referencia
 san <- san_mt[,c(1:10)]
 ```
-  
+
 ```{r}
 san$pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
 
@@ -75,9 +90,9 @@ san$índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratament
 
 san$volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
 ```
-    
-    
-## 7. Gráfico de mapa de valores ausentes (missing values)
+
+## 6. Gráfico de Mapa de Valores Ausentes (Missing Values)
+
 ```{r}
 # 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
 calc_missing_proportion <- function(df) {
@@ -136,12 +151,17 @@ interactive_plot <- ggplotly(gg)
 # 7. Mostrar o gráfico interativo
 interactive_plot
 ```
-   
 
-     
-# EVOLUCAO TEMPORAL DO INDICADOR NO ESTADO DE MT
+```{r}
+# Remove as linhas com valores ausentes
+san <- san[complete.cases(san),]
+```
 
-## 8. Extração da variável de interesse
+´
+
+# Evolução Temporal do Indicador no Estado de MT
+
+## 1. Extração da Variável de Interesse
 
 A variável 'datavar' contém o consumo per capita de água em litros por habitante por dia.
 
@@ -149,7 +169,7 @@ A variável 'datavar' contém o consumo per capita de água em litros por habita
 datavar = san$consumo_agua_percapita
 ```
 
-## 9. Armazenamento do dataset completo
+## 2. Armazenamento do Dataset Completo
 
 A variável 'data' recebe o dataset 'san' completo. \# Isso permite o uso de todos os dados na análise subsequente.
 
@@ -157,20 +177,19 @@ A variável 'data' recebe o dataset 'san' completo. \# Isso permite o uso de tod
 data = san
 ```
 
-## 10. Definição da legenda para gráficos
+## 3. Definição da Legenda para Gráficos
 
 Define a legenda para as visualizações que utilizam a variável 'datavar'. A legenda indica que a variável representa o "Consumo Percapita de Água" em litros por habitante por dia.
 
 ```{r}
 legendavar = 'Consumo Percapita de Água (1/hab/dia)'
 ```
-  
+
 ```{r}
 chave = 'media'
 ```
 
-
-## 10. Funções de suporte para gráficos
+## 4. Funções de Suporte para Gráficos
 
 ```{r}
 # Função para limpar strings, removendo espaços, caracteres especiais e acentos
@@ -192,7 +211,7 @@ cleanStr <- function(string) {
 }
 ```
 
-## 5. Definir tema personalizado para gráficos (ggplot2)
+## 5. Definir Tema Personalizado para Gráficos (ggplot2)
 
 ```{r}
 #Definindo gráfico
@@ -256,7 +275,7 @@ dev01 <- function(data, datavar, chave, legendavar) {
     dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = sum)
   } else if (chave == 'media') {
     # tirar media valores
-    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = mean)
+    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = sum)
     dataTime$x = round(dataTime$x, 2)
   } else {
     stop("Chave não encontrada! Tente 'agregar' ou 'media'.")
@@ -277,7 +296,8 @@ dev01 <- function(data, datavar, chave, legendavar) {
 }
 ```
 
-#Processar dados e gerar gráficos com base em variáveis específicas de um conjunto de dados.
+## 6. Processar Dados e Gerar Gráficos
+
 ```{r}
 # executar funcao
 dev01(san, san$pop_atendida_abas_agua, 'media','Pop. com Abastecimento de Água')
@@ -290,5 +310,3 @@ dev01(san, san$índice_tratamento_esgoto_percentual, 'agregar','Índice Tratamen
 
 dev01(san, san$volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
 ```
-
-   
