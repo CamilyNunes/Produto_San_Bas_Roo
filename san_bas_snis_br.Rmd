@@ -1,0 +1,176 @@
+---  
+title: "Relatório de Saneamento Básico"
+author: "Camily Nunes dos Santos"  
+output: 
+  html_document:
+    toc: true               # Ativa o índice
+    toc_float: 
+      collapsed: false      # Expande o índice automaticamente
+      smooth_scroll: true   # Rolagem suave ao clicar no índice
+      position: "left"      # Posição
+    theme: cosmo            # Tema Bootstrap para o HTML
+    highlight: tango         # Destacar a sintaxe em R
+    css: "estilo.css"       # Arquivo CSS personalizado    
+---    
+
+<!-- HTML para o logotipo -->
+<div class="header">
+  <div class="logo-container">
+    <img src="imagens_logo_ufr.png" alt="Logotipo UFR">
+  </div>
+  <h1>Relatório de Saneamento Básico</h1>
+  <p>Camily Nunes dos Santos</p>
+</div>
+  
+# Objetivo Final
+
+O objetivo deste relatório é explorar e analisar os dados do Sistema Nacional de Informação sobre Saneamento (SNIS) para entender a situação do saneamento básico em Mato Grosso. Especificamente, buscamos:
+
+-   **Avaliar a cobertura de serviços de água e esgoto**, analisando a evolução desses indicadores ao longo dos anos.
+-   **Identificar desigualdades regionais** no acesso a saneamento básico e suas implicações para a saúde pública.
+-   **Utilizar visualizações** e métodos estatísticos para apresentar os dados de maneira clara e acessível, facilitando a interpretação dos resultados.
+-   **Contribuir para a formulação de políticas públicas** eficazes, fundamentadas em evidências, que promovam melhorias no setor de saneamento.
+
+Com isso, esperamos que este relatório sirva como uma ferramenta útil para gestores públicos, pesquisadores e membros da sociedade civil, incentivando um debate informado sobre o tema.
+
+## 1. Preparar o Ambiente de Trabalho
+
+Criar uma pasta de trabalho: O código começa configurando o diretório de trabalho, onde estarão os arquivos de dados e onde os resultados serão salvos.
+
+**Dica:** Vá para **Session \> Set Working Directory \> Choose Directory**.
+
+## 2. Instalar e Carregar Pacotes
+
+### 2.1 Instalar Pacotes (se necessário):
+
+Caso os pacotes ainda não estejam instalados, você pode instalar com os comandos abaixo:  
+  
+```{r}
+# Lista de pacotes necessários
+pacotes <- c("ggplot2", "dplyr", "tidyr", "plotly", "readr", "zoo")
+```
+
+```{r}
+# Instalar os pacotes que ainda não estão instalados
+pacotes_nao_instalados <- pacotes[!(pacotes %in% installed.packages()[,"Package"])]
+if(length(pacotes_nao_instalados)) install.packages(pacotes_nao_instalados)
+```
+
+### 2.2 Carregar os Pacotes
+
+```{r}
+invisible(lapply(pacotes, function(pkg) {
+  if (!require(pkg, character.only = TRUE)) {
+    stop(paste("Falha ao carregar o pacote:", pkg))
+  }
+}))
+```
+
+## 3. Carregar os Dados
+
+```{r}
+url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/SNISMTAgregado.csv"  
+
+san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
+```
+
+## 4. Desabilitar Notação Científica
+
+Para garantir que os números não sejam representados em notação científica:
+
+```{r}
+options(scipen = 999) 
+```
+
+## 5. Tratar os Dados do SNIS
+
+Selecionar colunas de interesse:
+
+```{r}
+# selecionar variaveis de referencia
+san <- san_mt[,c(1:10)]
+```
+
+```{r}
+san$pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+
+san$consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
+
+san$índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
+
+san$índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
+
+san$volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
+```
+
+## 6. Gráfico de Mapa de Valores Ausentes (Missing Values)
+
+```{r}
+# 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
+calc_missing_proportion <- function(df) {
+  missing_data <- sapply(df, function(col) {
+    mean(is.na(col))
+  })
+  
+  missing_df <- data.frame(
+    Atributo = names(missing_data),
+    ProporcaoOmissos = missing_data)
+  
+  missing_df <- missing_df %>%
+    filter(ProporcaoOmissos > 0)
+  
+  return(missing_df)
+}
+
+# 2. Calcular a proporção de valores omissos no conjunto de dados 'san'
+missing_proportions <- calc_missing_proportion(san)
+
+# 3. Preparar os dados para a plotagem em forma de gráfico de barra empilhada
+plot_data <- missing_proportions %>%
+  mutate(Presentes = 1 - ProporcaoOmissos) %>%
+  pivot_longer(cols = c(ProporcaoOmissos, Presentes), 
+               names_to = "Status", 
+               values_to = "Proporcao")
+
+# 4. Definir as cores de acordo com seu Tema dos Gráficos
+cor_omisso <- "#FF6347"
+cor_presente <- "#006400"
+
+# 5. Criar o gráfico de coluna empilhada em 100% e inverter os eixos
+gg <- ggplot(plot_data, aes(x = Proporcao, 
+                             y = Atributo, 
+                             fill = Status)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_x_continuous(labels = scales::percent) +
+  labs(
+    title = "Proporção de Valores Omissos por Atributo",
+    x = "Proporção (%)",
+    y = "Atributos") +
+  scale_fill_manual(values = c("ProporcaoOmissos" = cor_omisso, "Presentes" = cor_presente), 
+                    labels = c("Valores Presentes", "Valores Omissos")) +
+  theme_minimal() + 
+  theme(
+    axis.title.x = element_text(size = 1.5, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 1.5, face = "bold", color = "black", angle = 90),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    panel.grid.major = element_line(color = "grey85"),
+    panel.grid.minor = element_blank())
+
+# 6. Converter o gráfico ggplot em um gráfico interativo com plotly
+interactive_plot <- ggplotly(gg)
+
+# 7. Mostrar o gráfico interativo
+interactive_plot
+```
+  
+## 7. Aplicação do Método de Interpolação   
+
+  A interpolação é uma técnica usada para estimar valores desconhecidos dentro de um intervalo de dados conhecidos. Em séries temporais, a interpolação nos permite preencher valores ausentes com base nos valores antes e depois do ponto em falta, criando uma "ponte" entre os dados disponíveis. Isso é especialmente útil para manter a consistência dos dados e evitar problemas que poderiam surgir ao usar conjuntos de dados com muitas lacunas.
+
+    
+```{r}
+# Aplicar interpolação linear nas variáveis numéricas
+san <- san %>%
+  mutate(across(where(is.numeric), ~ na.approx(.)))
+```

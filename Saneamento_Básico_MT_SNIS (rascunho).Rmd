@@ -50,4 +50,5 @@ san <- san %>%
   mutate(across(where(is.character), ~ replace_na(., "0")))  # Substitui NA por "0" nas colunas de texto
 ```
      
-    
+      
+      position: "left"

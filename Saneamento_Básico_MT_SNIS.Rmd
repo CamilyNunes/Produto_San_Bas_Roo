@@ -11,7 +11,8 @@ output:
     theme: cosmo            # Tema Bootstrap para o HTML
     highlight: tango         # Destacar a sintaxe em R
     css: "estilo.css"       # Arquivo CSS personalizado    
-    
+---    
+
 <!-- HTML para o logotipo -->
 <div class="header">
   <div class="logo-container">
@@ -20,13 +21,6 @@ output:
   <h1>Relatório de Saneamento Básico</h1>
   <p>Camily Nunes dos Santos</p>
 </div>
-
-<h2>Objetivo Final</h2> 
-      
----    
-
-
-  
   
 # Objetivo Final
 
