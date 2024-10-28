@@ -1,27 +1,8 @@
 ---  
 title: "Relatório de Saneamento Básico"
 author: "Camily Nunes dos Santos"  
-output: 
-  html_document:
-    toc: true               # Ativa o índice
-    toc_float: 
-      collapsed: false      # Expande o índice automaticamente
-      smooth_scroll: true   # Rolagem suave ao clicar no índice
-      position: "left"      # Posição
-    theme: cosmo            # Tema Bootstrap para o HTML
-    highlight: tango         # Destacar a sintaxe em R
-    css: "estilo.css"       # Arquivo CSS personalizado    
 ---    
 
-<!-- HTML para o logotipo -->
-<div class="header">
-  <div class="logo-container">
-    <img src="imagens_logo_ufr.png" alt="Logotipo UFR">
-  </div>
-  <h1>Relatório de Saneamento Básico</h1>
-  <p>Camily Nunes dos Santos</p>
-</div>
-  
 # Objetivo Final
 
 O objetivo deste relatório é explorar e analisar os dados do Sistema Nacional de Informação sobre Saneamento (SNIS) para entender a situação do saneamento básico em Mato Grosso. Especificamente, buscamos:
@@ -69,11 +50,16 @@ invisible(lapply(pacotes, function(pkg) {
 ## 3. Carregar os Dados
 
 ```{r}
-url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/SNISMTAgregado.csv"  
+url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/agregado_snis_brasil.csv"  
 
-san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
+san_br <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
 ```
-
+  
+```{r}
+san_br <- read_csv(url, locale = locale(encoding = "ISO-8859-1"))
+```
+     
+    
 ## 4. Desabilitar Notação Científica
 
 Para garantir que os números não sejam representados em notação científica:
@@ -88,19 +74,19 @@ Selecionar colunas de interesse:
 
 ```{r}
 # selecionar variaveis de referencia
-san <- san_mt[,c(1:10)]
+san <- san_br[,c(1:10)]
 ```
 
 ```{r}
-san$pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+san$pop_atendida_abas_agua <- san_br$`AG001 - População total atendida com abastecimento de água`
 
-san$consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
+san$consumo_agua_percapita <- san_br$`IN022 - Consumo médio percapita de água`
 
-san$índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
+san$índice_coleta_esgoto <- san_br$`IN015 - Índice de coleta de esgoto`
 
-san$índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
+san$índice_tratamento_esgoto_percentual <- san_br$`IN016 - Índice de tratamento de esgoto`
 
-san$volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
+san$volume_esgoto_coletado_m3 <- san_br$`ES005 - Volume de esgotos coletado`
 ```
 
 ## 6. Gráfico de Mapa de Valores Ausentes (Missing Values)
