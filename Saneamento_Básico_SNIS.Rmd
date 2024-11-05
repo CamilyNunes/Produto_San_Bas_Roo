@@ -1,0 +1,448 @@
+---
+title: "Avaliação dos Avanços de Rondonópolis (MT) em Relação ao Objetivo de Desenvolvimento Sustentável 6 (ODS 6) – Água Potável e Saneamento"
+author: "Camily Nunes dos Santos"  
+output: 
+  html_document:
+    toc: true               # Ativa o índice
+    toc_float: 
+      collapsed: false      # Expande o índice automaticamente
+      smooth_scroll: true   # Rolagem suave ao clicar no índice
+      position: "left"      # Posição
+    theme: cosmo            # Tema Bootstrap para o HTML
+    highlight: tango         # Destacar a sintaxe em R
+    css: "estilo.css"       # Arquivo CSS personalizado    
+---
+
+```{r capa, echo=FALSE, out.width="30%", fig.align='center'}
+# Adicione o logotipo da universidade na capa
+knitr::include_graphics("https://ufr.edu.br/protic/wp-content/uploads/2022/04/PROEXA-branco.png") # Substitua com o caminho para a imagem do logotipo
+```
+
+# 1. Intro
+
+O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030. Este artigo avalia o progresso do município de Rondonópolis, Mato Grosso, em relação às metas estabelecidas pelo ODS 6, observando indicadores específicos para identificar avanços e áreas que demandam maior atenção.
+
+# 2. Objetivo
+
+O estudo visa verificar se o município de Rondonópolis está caminhando na direção das metas do ODS 6, com foco em:
+
+6.1: Acesso universal e equitativo à água potável segura;\
+6.2: Acesso a saneamento e higiene adequados e equitativos, eliminando a defecação a céu aberto;\
+6.3: Melhoria da qualidade da água e aumento da reciclagem e reutilização; 6.4: Eficiência no uso da água e redução da escassez de água; 6.5: Implementação da gestão integrada dos recursos hídricos; 6.6: Proteção e restauração de ecossistemas aquáticos; 6.7: Ampliação da cooperação internacional para apoio técnico e capacitação; 6.8: Fortalecimento da participação comunitária na gestão da água e saneamento.
+
+# 3. Metodologia
+
+Esta seção descreve as etapas de preparação e análise dos dados para avaliar o progresso de Rondonópolis em relação às metas do ODS 6. O processo metodológico inclui a instalação e carregamento de pacotes, carregamento dos dados e tratamento dos dados do SNIS para selecionar as variáveis de interesse.
+
+## 3.1 Instalar e Carregar Pacotes
+
+Para realizar a análise, utilizamos uma série de pacotes no R, essenciais para manipulação, visualização e análise de dados geoespaciais e de séries temporais. Os pacotes usados incluem ggplot2 para visualizações, dplyr para manipulação de dados, plotly para gráficos interativos, entre outros.
+
+-   **Instalar Pacotes (se necessário):**
+
+Primeiramente, verificamos se os pacotes necessários estão instalados. Caso não estejam, são instalados automaticamente.
+
+```{r}
+# Lista de pacotes necessários
+pacotes <- c("ggplot2", "dplyr", "tidyr", "plotly", "readr", "zoo", "censobr", "geobr", "sf", "httr", "jsonlite")  
+  
+# Instalar os pacotes que ainda não estão instalados
+pacotes_nao_instalados <- pacotes[!(pacotes %in% installed.packages()[,"Package"])]
+if(length(pacotes_nao_instalados)) install.packages(pacotes_nao_instalados)
+```
+
+-   **Carregamento dos Pacotes**:
+
+Após garantir que todos os pacotes estão instalados, eles são carregados no ambiente R.
+
+```{r}
+invisible(lapply(pacotes, function(pkg) {
+  if (!require(pkg, character.only = TRUE)) {
+    stop(paste("Falha ao carregar o pacote:", pkg))
+  }
+}))
+```
+
+Esses pacotes garantem uma base sólida para o carregamento, manipulação e visualização dos dados que serão utilizados na análise.
+
+## 3. 2 Carregar os Dados
+
+Os dados utilizados neste estudo foram extraídos do Sistema Nacional de Informações sobre Saneamento (SNIS) e estão hospedados em um repositório do GitHub. Para assegurar a reprodutibilidade, o código carrega diretamente o arquivo CSV a partir da URL fornecida.
+
+-   **Fonte dos Dados**: Repositório GitHub da pesquisadora.
+-   **Formato do Arquivo**: Arquivo CSV com separador `;` e codificação `ISO-8859-1`, que permite a leitura correta de caracteres em português.
+
+```{r}
+url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/Agregado-20240925161723-SNISMT.csv"  
+
+san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
+```
+   
+```{r}
+san_mt <- read.csv("https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/Agregado-20240925161723-SNISMT.csv", sep = ";", encoding = "UTF-8")
+```
+     
+     
+## 3. 3 Tratamento dos Dados
+
+Após o carregamento, realizamos o tratamento dos dados para selecionar as colunas de interesse e garantir que os indicadores relevantes para o estudo estejam bem organizados. Esse processo inclui a seleção das variáveis de saneamento e o filtro para a cidade de Rondonópolis.
+
+-   **Desabilitar Notação Científica:** Para garantir que os números não sejam representados em notação científica:
+
+```{r}
+options(scipen = 999) 
+```
+
+-   **Seleção de Colunas de Interesse**: Escolhemos apenas as colunas que contêm indicadores fundamentais para a análise de saneamento em Rondonópolis, como população atendida com água, consumo per capita de água e índices de coleta e tratamento de esgoto.
+
+Selecionar colunas de interesse:
+
+```{r}
+# selecionar variaveis de referencia
+san <- san_mt[,c(1:10)]
+```
+  
+```{r}
+san$Pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+```
+    
+    
+```{r}   
+san$Pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+san$Consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
+san$Índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
+san$Índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
+san$Volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado` 
+```
+
+-   **Filtragem por Município:**
+
+A seguir, filtramos os dados para o município de Rondonópolis, que é o foco deste estudo.
+
+```{r}
+# Filtrando a cidade de Rondonópolis
+san_roo <- san[san$Município == "Rondonópolis", ]  
+```
+
+-   **Padronização das Colunas**:
+
+Para facilitar a interpretação, renomeamos algumas colunas, garantindo a consistência no conjunto de dados.
+
+```{r}
+# Supondo que a coluna em uma das tabelas esteja com um nome diferente, renomeie para padronizar
+san_roo <- san_roo %>%
+  rename(`Ano` = `Ano de Referência`)
+```
+
+Esse tratamento garante que os dados estejam prontos para análise, permitindo explorar os indicadores de forma estruturada e analisar o progresso do município em relação às metas do ODS 6.
+
+# 4. Análise dos Dados
+
+Nesta seção, exploramos os dados de saneamento básico e consumo de água para o município de Rondonópolis, com o objetivo de avaliar seu progresso em relação às metas do ODS 6. A análise inclui a visualização da qualidade e completude dos dados, o cálculo de indicadores fundamentais e a criação de gráficos interativos que facilitam a interpretação e exploração dos dados ao longo do tempo.
+
+## 4.1 Análise de Valores Ausentes
+
+Para garantir a consistência e confiabilidade da análise, é importante identificar e visualizar a proporção de valores ausentes em cada variável do conjunto de dados. Isso permite uma melhor compreensão de possíveis lacunas de dados que possam afetar os resultados.
+
+-   **Gráfico de Proporção de Valores Ausentes**:
+
+Abaixo, geramos um gráfico de barra empilhada que mostra a proporção de valores presentes e ausentes para cada atributo relevante. Esse gráfico indica quais variáveis precisam de atenção adicional em termos de completude de dados.
+
+6\. Gráfico de Mapa de Valores Ausentes (Missing Values)
+
+```{r}
+# 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
+calc_missing_proportion <- function(df) {
+  missing_data <- sapply(df, function(col) {
+    mean(is.na(col))
+  })
+  
+  missing_df <- data.frame(
+    Atributo = names(missing_data),
+    ProporcaoOmissos = missing_data)
+  
+  missing_df <- missing_df %>%
+    filter(ProporcaoOmissos > 0)
+  
+  return(missing_df)
+}
+
+# 2. Calcular a proporção de valores omissos no conjunto de dados
+missing_proportions <- calc_missing_proportion(san_roo)
+
+# 3. Preparar os dados para a plotagem em forma de gráfico de barra empilhada
+plot_data <- missing_proportions %>%
+  mutate(Presentes = 1 - ProporcaoOmissos) %>%
+  pivot_longer(cols = c(ProporcaoOmissos, Presentes), 
+               names_to = "Status", 
+               values_to = "Proporcao")
+
+# 4. Definir as cores de acordo com seu Tema dos Gráficos
+cor_omisso <- "#FF6347"
+cor_presente <- "#006400"
+
+# 5. Criar o gráfico de coluna empilhada em 100% e inverter os eixos
+gg <- ggplot(plot_data, aes(x = Proporcao, 
+                             y = Atributo, 
+                             fill = Status)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_x_continuous(labels = scales::percent) +
+  labs(
+    title = "Proporção de Valores Omissos por Atributo",
+    x = "Proporção (%)",
+    y = "Atributos") +
+  scale_fill_manual(values = c("ProporcaoOmissos" = cor_omisso, "Presentes" = cor_presente), 
+                    labels = c("Valores Presentes", "Valores Omissos")) +
+  theme_minimal() + 
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 14, face = "bold", color = "black", angle = 90),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    panel.grid.major = element_line(color = "grey85"),
+    panel.grid.minor = element_blank())  
+
+
+# Salvar o gráfico em um arquivo PNG
+  ggsave(
+    filename = paste0('grafico_', cleanStr(legendavar), '.png'), 
+    plot = gg, 
+    path = 'resultados',
+    width = 8,
+    height = 4,
+    units = 'in'
+  )
+  
+# 6. Converter o gráfico ggplot em um gráfico interativo com plotly
+interactive_plot <- ggplotly(gg)
+
+# 7. Mostrar o gráfico interativo
+interactive_plot
+```
+
+O gráfico acima permite identificar rapidamente as variáveis com valores ausentes. As variáveis com maiores proporções de omissão indicam potenciais lacunas nos dados do SNIS, que devem ser consideradas nas interpretações dos resultados.
+
+```{r}
+# Remove as linhas com valores ausentes
+san_roo <- san_roo[complete.cases(san_roo),] 
+```
+
+```{r}
+# 1. Extração da Variável de Interesse
+# A variável 'datavar' contém o consumo per capita de água em litros por habitante por dia.
+datavar <- san_roo$Consumo_agua_percapita
+
+# 2. Armazenamento do Dataset Completo
+# A variável 'data' recebe o dataset 'san' completo.
+# Isso permite o uso de todos os dados na análise subsequente.
+data <- san_roo
+
+# 3. Definição da Legenda para Gráficos
+# Define a legenda para as visualizações que utilizam a variável 'datavar'.
+# A legenda indica que a variável representa o "Consumo Percapita de Água" em litros por habitante por dia.
+legendavar <- 'Consumo Percapita de Água (1/hab/dia)'
+
+# Definição de chave para a média
+chave <- 'media'
+```
+
+## 4.2 Indicadores de Saneamento
+
+Os indicadores de saneamento são fundamentais para avaliar o progresso em direção às metas do ODS 6. Abaixo estão apresentados alguns dos principais indicadores para o município de Rondonópolis:
+
+-   População Atendida com Abastecimento de Água (Pop_atendida_abas_agua)
+
+-    Consumo de Água Per Capita (Consumo_agua_percapita)
+
+-    Índice de Coleta de Esgoto (Índice_coleta_esgoto)
+
+-   Índice de Tratamento de Esgoto (Índice_tratamento_esgoto_percentual)
+
+-   Volume de Esgoto Coletado (Volume_esgoto_coletado_m3)
+
+    ```{r}
+# Selecionar e visualizar os principais indicadores
+indicadores <- san_roo %>% 
+      select(Ano, Pop_atendida_abas_agua, Consumo_agua_percapita, 
+             Índice_coleta_esgoto,
+             Índice_tratamento_esgoto_percentual, 
+             Volume_esgoto_coletado_m3)
+
+# Exibir a tabela dos indicadores
+indicadores
+    ```
+
+## 4. Funções de Suporte para Gráficos
+
+```{r}
+# Função para limpar strings, removendo espaços, caracteres especiais e acentos
+cleanStr <- function(string) {
+  
+  # Carregar pacotes necessários apenas uma vez
+  if (!require(stringi)) install.packages("stringi", quietly = TRUE)
+  if (!require(stringr)) install.packages("stringr", quietly = TRUE)
+  
+  # Limpar e normalizar a string
+  string <- str_replace_all(string, ' ', '_')
+  string <- str_replace_all(string, '-', '_')
+  string <- str_replace_all(string, '%', '')
+  string <- str_replace_all(string, '/', '_')
+  string <- stri_trans_general(string, "latin-ascii")
+  string <- tolower(string)
+  
+  return(string)
+}
+```
+
+## 5. Definir Tema Personalizado para Gráficos (ggplot2)
+
+```{r}
+tema_plot <- function(dataTime, legendavar, chave) {
+  
+  # Criar gráfico básico de linha com o tema minimalista
+  plot <- ggplot(data = dataTime, aes(x = tempo, y = x, group = 1)) +
+            geom_line(color = "#006400", size = 1.2) +  # Linha na cor verde-escura
+            geom_label(aes(label = label), size = 3, color = "#006400", nudge_y = 0.5) +  # Rótulos em verde-escuro
+            labs(
+              title = "Evolução Temporal de Rondonópolis (MT)",
+              subtitle = legendavar,
+              x = "Ano",  # Legenda para o eixo X
+              y = legendavar  # Legenda para o eixo Y
+            ) +
+            scale_x_continuous(
+              breaks = seq(from = min(dataTime$tempo), to = max(dataTime$tempo), by = 1),
+              limits = c(min(dataTime$tempo), max(dataTime$tempo)),
+              expand = c(0, 0)  # Remover margens extras
+            ) +
+            scale_color_distiller(palette = "Greens", direction = 1) +  # Paleta de cores Greens
+            theme_minimal() %+replace%  # Manter um tema minimalista com os eixos
+            theme(
+              axis.title.x = element_text(size = 10, face = "bold", color = "black"),  # Legenda do eixo X
+              axis.title.y = element_text(size = 10, face = "bold", color = "black", angle = 90),  # Legenda Y na vertical
+              axis.text.x = element_text(size = 10, angle = 45, hjust = 1),  # Texto do eixo X com rotação
+              axis.text.y = element_text(size = 10),  # Texto do eixo Y
+              plot.title = element_text(size = 14, face = "bold", hjust = 0.5),  # Título centralizado
+              plot.subtitle = element_text(size = 12, hjust = 0.5),  # Subtítulo centralizado
+              panel.grid.major.x = element_blank(),  # Remover linhas de grid principais do eixo X
+              panel.grid.major.y = element_line(color = "grey85"),  # Linhas de grid principais do eixo Y
+              panel.grid.minor = element_blank(),  # Remover grid secundário
+              legend.position = "none"  # Sem legenda adicional
+            )
+  
+  # Agregar escala Y caso solicitado
+  if (chave == 'agregar') {
+    plot <- plot + scale_y_continuous(limits = range(dataTime$x, na.rm = TRUE))
+  }
+  
+  # Salvar o gráfico em um arquivo PNG
+  ggsave(
+    filename = paste0('grafico_', cleanStr(legendavar), '.png'), 
+    plot = plot, 
+    path = 'resultados',
+    width = 8,
+    height = 4,
+    units = 'in'
+  )
+  
+  # Converta o gráfico ggplot em um gráfico interativo
+  plot_interativo <- ggplotly(plot)
+  
+  return(plot_interativo)
+}
+```
+
+```{r}
+dev01 <- function(data, datavar, chave, legendavar) {
+  
+  if (chave == 'agregar') {
+    # agregar valores
+    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano`)), FUN = sum)
+  } else if (chave == 'media') {
+    # tirar media valores
+    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano`)), FUN = mean)
+    dataTime$x = round(dataTime$x, 2)
+  } else {
+    stop("Chave não encontrada! Tente 'agregar' ou 'media'.")
+  }
+  
+  # label
+  dataTime$label <- NA
+  n <- min(5, nrow(dataTime)) #Seleciona no máximo 5 pontos
+  idx <- seq(1, nrow(dataTime), length.out = n)
+  dataTime$label[idx] <- dataTime$x[idx]
+  
+  # A coluna 'x' precisa ser definida aqui
+  colnames(dataTime)[2] <- "x"  # Renomeia a coluna para 'x'
+  
+  # gráfico
+  plot = tema_plot(dataTime, legendavar, chave)
+  return(plot)
+}
+```
+
+## 6. Processar Dados e Gerar Gráficos
+
+## 6.1 Até 2030, alcançar o acesso universal e equitativo a água potável e segura para todos.
+
+Ao longo dos anos, houve um aumento de habitantes de rondonópolis com abastecimento de água, saindo de 145.600 habitantes em 2000 a 244.911 em 2022.
+
+```{r}
+dev01(san_roo, san_roo$Pop_atendida_abas_agua, 'media','Pop. com Abastecimento de Água')
+```
+
+Rondonópolis está proximo de bater a meta?
+
+```{r}
+# Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
+san_meta <- san_roo %>%
+  dplyr::filter(`Ano` >= 2001 & `Ano` <= 2021) %>%
+  dplyr::select(`Ano`, `Pop_atendida_abas_agua`) %>%
+  dplyr::mutate(Pop_atendida_abas_agua = as.numeric(gsub("[.,]", "", Pop_atendida_abas_agua)))
+```
+
+Coletar os Dados da API SIDRA
+
+Vamos usar o código da tabela 6579, que traz estimativas anuais de população. Aqui está o código para extrair os dados:
+
+```{r}
+# URL da API do SIDRA para população de Rondonópolis
+url <- "https://apisidra.ibge.gov.br/values/t/6579/p/all/n6/5107602"
+
+# Requisitar dados da API
+resposta <- GET(url)
+populacao_rondonopolis <- fromJSON(content(resposta, "text"))
+```
+
+Preparar os Dados
+
+Normalmente, a estrutura de dados do SIDRA inclui várias colunas além das que você precisa. Neste caso, vamos focar nos dados de ano e população para estruturar a série temporal:
+
+```{r}
+# Selecionar colunas relevantes, incluindo o código do município
+pop_total <- populacao_rondonopolis %>%
+  select(Ano = D1N, Populacao = V) %>%
+  mutate(Ano = as.numeric(Ano), 
+         Populacao = as.numeric(Populacao))
+```
+
+Juntar dataframe "san_meta" e "pop_total" e realizar a metrica da meta 6
+
+```{r}
+san_bas <- inner_join(san_meta, pop_total, "Ano")
+```
+
+```{r}
+# Criar nova coluna com a divisão de Pop_atendida_abas_agua por populacao
+san_bas_meta <- san_bas %>%
+  mutate(perc_pop_atendida = (Pop_atendida_abas_agua / Populacao) * 100)
+```
+
+```{r}
+dev01(san_roo, san_roo$Consumo_agua_percapita, 'agregar','Consumo Percapita de Água (l-hab-dia)')
+
+dev01(san_roo, san_roo$Índice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
+
+dev01(san_roo, san_roo$Índice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
+
+dev01(san_roo, san_roo$Volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
+```

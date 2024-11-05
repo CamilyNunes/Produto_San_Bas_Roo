@@ -1,0 +1,411 @@
+---
+title: "Relatório de Saneamento Básico"
+author: "Camily Nunes dos Santos"  
+output: 
+  html_document:
+    df_print: paged
+    theme: flatly
+    highlight: tango
+runtime: shiny   
+---  
+
+# Introdução 
+
+A disponibilidade e a qualidade do saneamento básico desempenham um papel fundamental na promoção da saúde pública e no desenvolvimento socioeconômico das regiões. Em particular, o estado de Mato Grosso, com suas características regionais e socioeconômicas diversas, apresenta desafios e oportunidades para a melhoria dos serviços de água e esgoto. Este artigo tem como objetivo explorar e analisar os dados fornecidos pelo Sistema Nacional de Informações sobre Saneamento (SNIS) para compreender a situação do saneamento básico em Mato Grosso, considerando não apenas a cobertura dos serviços, mas também as disparidades regionais e suas implicações.
+
+Para alcançar este objetivo, buscamos, primeiramente, carregar e processar dados geoespaciais dos municípios de Mato Grosso e do Brasil, usando bases de dados públicas, como IBGE e SNIS. Com esses dados, serão calculados indicadores de cobertura que representem a proporção de domicílios atendidos por serviços de abastecimento de água e coleta de esgoto. Essa análise será acompanhada de visualizações interativas, com o uso de pacotes em R, como `leaflet` e `ggplot2`, permitindo a representação espacial dos dados e facilitando a interpretação dos resultados.
+
+Além disso, o artigo também propõe uma análise comparativa entre os indicadores de saneamento básico de Mato Grosso e os dados nacionais, com o intuito de identificar desigualdades regionais e contribuir para a formulação de políticas públicas embasadas em evidências. Com isso, espera-se que o estudo seja uma ferramenta informativa e prática para gestores públicos, pesquisadores e membros da sociedade civil, promovendo um debate embasado e incentivando melhorias no setor de saneamento.
+  
+## 1. Instalar e Carregar Pacotes
+
+### 1.1 Instalar Pacotes (se necessário):
+
+Caso os pacotes ainda não estejam instalados, você pode instalar com os comandos abaixo:
+
+```{r}
+# Lista de pacotes necessários
+pacotes <- c("ggplot2", "dplyr", "tidyr", "plotly", "readr", "zoo", "censobr", "geobr", "sf")
+```
+
+```{r}
+# Instalar os pacotes que ainda não estão instalados
+pacotes_nao_instalados <- pacotes[!(pacotes %in% installed.packages()[,"Package"])]
+if(length(pacotes_nao_instalados)) install.packages(pacotes_nao_instalados)
+```
+
+### 1.2 Carregar os Pacotes
+
+```{r}
+invisible(lapply(pacotes, function(pkg) {
+  if (!require(pkg, character.only = TRUE)) {
+    stop(paste("Falha ao carregar o pacote:", pkg))
+  }
+}))
+```
+    
+##Objetivo   
+1. Carregar os dados dos municípios e de saneamento.  
+2. Manipular os dados e calcular indicadores de cobertura.  
+3. Visualizar a cobertura de saneamento com mapas interativos.  
+4. Comparar os dados entre Brasil e Mato Grosso.
+
+# Manipulação dos Dados
+
+```{r}
+#Carregar os dados de municípios (geometria)
+mun = geobr::read_municipality (year = 2010)
+```
+
+```{r}
+#Carregar os dados de saneamento
+san = censobr::read_households (year = 2010, showProgress = FALSE)
+```
+
+-   A função collect() faz com que o R siga todo passo a passo para fazer com que seus dados vire em dataframe.
+
+-   O operador pipeline %\>%, é uma especie de ligação entre a agrupação dos dados do municipios, antes precisamos saber
+
+-   Veja sobre as variaveis:[<https://www.ipea.gov.br/redeipea/images/pdfs/descricao_das_variaveis_censo_2010.pdf>]
+
+# Quais municipios tem rede de esgoto?
+
+```{r}
+# Manipular os dados: calcular cobertura de rede de esgoto
+options(arrow.unsafe_metadata = TRUE)  
+  
+dados <- san %>%
+  collect() %>%
+  group_by(code_muni) %>%
+  summarise(
+    rede = sum(V0010[V0207 == '1'], na.rm = TRUE),  # Soma de rede
+    total = sum(V0010, na.rm = TRUE)) %>% 
+  mutate(cobertura = rede / total)  # Calcula a cobertura
+```
+
+**V0010** – Peso Numa pesquisa realizada por amostragem probabilística, cada unidade selecionada na amostra representa, também, outras unidades que fazem parte da população-alvo. Assim, para cada unidade domiciliar selecionada na amostra do Censo Demográf ico 2010, foi associado um fator de expansão ou peso. Esse peso foi obtido através do ajuste de um peso inicial dado pelo inverso da fração amostral efetiva, que é o número total de domicílios recenseados dividido pelo número de domicílios selecionados para a amostra em uma determinada área geográf ica. O peso obtido para uma determinada unidade domiciliar foi atribuído também a cada um de seus moradores. Por unidades domiciliares pesquisadas, entende-se os domicílios particulares ocupados e as famílias e pessoas sós, moradoras em domicílio coletivo (também denominadas unidades de habitação em domicílios coletivos).
+
+**V0207** – Esgotamento sanitário, tipo Informação coletada somente para domicílios particulares permanentes. Classificação da Informação: 1 – Rede geral de esgoto ou pluvial: quando a canalização das águas servidas e dos dejetos, proveniente do banheiro ou sanitário, estava ligada a um sistema de coleta que os conduzia a um desaguadouro geral da área, região ou município, mesmo que o sistema não dispusesse de estação de tratamento da matéria esgotada.
+
+### Para fazer o Mapa, precisamos:  
+
+escolher de qual banco de dados usar.
+
+1.  Qual é a geometria?
+
+2.  Titulo
+
+3.  Escala
+
+4.  Tema
+
+### Antes de fazer o mapa é preciso juntar os dataflames san e mun
+
+```{r}
+dados_juntos = left_join(mun, dados, by = 'code_muni')
+```
+
+### Verifique se as colunas são compativeis!
+
+```{r}
+#mudar a categoria do dado se for necessário.
+mun$code_muni = as.character(mun$code_muni)
+```
+
+# Mapa do Brasil - Cobertura de Rede de Esgoto
+
+```{r}
+ggplot(data = dados_juntos, aes(fill = cobertura))+ #Define o banco de dados e a forma de preenchimento
+  geom_sf() + # Plota o mapa com geometria espacial (sf) 
+  labs( title = "Cobertura de Saneamento no Brasil (2010)", # Corrige o título
+fill = "Cobertura de Saneamento" ) + # Ajusta o rótulo da legenda
+scale_fill_distiller(palette = "Greens", direction = 1) + # Escolhe uma paleta válida 
+  theme_void() # Aplica o tema sem eixos e sem gridlines
+```
+  
+
+# Mapa para o estado de Mato Grosso
+
+```{r}
+mt = dados_juntos %>% filter(abbrev_state == 'MT')
+```
+
+```{r}
+mt$text <- paste("Cidade:", mt$name_muni, "<br> Cobertura de Saneamento:", mt$cobertura)
+```
+
+```{r}
+# Criar o mapa com ggplot2
+mapa_mt <- ggplot(data = mt, aes(fill = cobertura, text = text)) + # Define o banco de dados e a forma de preenchimento 
+  geom_sf() + # Plota o mapa com geometria espacial (sf) 
+  labs(title = "Cobertura de Saneamento em Mato Grosso (2010)", # Corrige o título
+       fill = "Cobertura de Saneamento") + # Ajusta o rótulo da legenda
+  scale_fill_distiller(palette = "Greens", direction = 1) + # Escolhe uma paleta válida 
+  theme_void() # Aplica o tema sem eixos e sem gridlines  
+
+# Transformar o gráfico em um gráfico interativo com plotly
+mapa_mt_interativo <- ggplotly(mapa_mt, tooltip = "text")  
+  
+# Mostrar o gráfico interativo
+mapa_mt_interativo
+```
+    
+#  
+
+# 2º parte      
+  
+## 3. Carregar os Dados
+
+```{r}
+url <- "https://github.com/CamilyNunes/produto_snis_mt/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/Agregado-20240925161723-SNISMT.csv"  
+
+san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
+```
+
+## 4. Desabilitar Notação Científica
+
+Para garantir que os números não sejam representados em notação científica:
+
+```{r}
+options(scipen = 999) 
+```
+
+## 5. Tratar os Dados do SNIS
+
+Selecionar colunas de interesse:
+
+```{r}
+# selecionar variaveis de referencia
+san <- san_mt[,c(1:10)]
+```
+
+```{r}
+san$Pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+
+san$Consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
+
+san$Índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
+
+san$Índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
+
+san$Volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
+```
+
+```{r}
+# Filtrando a cidade de Rondonópolis
+san_roo <- san[san$Município == "Rondonópolis", ]
+```
+
+## 6. Gráfico de Mapa de Valores Ausentes (Missing Values)
+
+```{r}
+# 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
+calc_missing_proportion <- function(df) {
+  missing_data <- sapply(df, function(col) {
+    mean(is.na(col))
+  })
+  
+  missing_df <- data.frame(
+    Atributo = names(missing_data),
+    ProporcaoOmissos = missing_data)
+  
+  missing_df <- missing_df %>%
+    filter(ProporcaoOmissos > 0)
+  
+  return(missing_df)
+}
+
+# 2. Calcular a proporção de valores omissos no conjunto de dados
+missing_proportions <- calc_missing_proportion(san_roo)
+
+# 3. Preparar os dados para a plotagem em forma de gráfico de barra empilhada
+plot_data <- missing_proportions %>%
+  mutate(Presentes = 1 - ProporcaoOmissos) %>%
+  pivot_longer(cols = c(ProporcaoOmissos, Presentes), 
+               names_to = "Status", 
+               values_to = "Proporcao")
+
+# 4. Definir as cores de acordo com seu Tema dos Gráficos
+cor_omisso <- "#FF6347"
+cor_presente <- "#006400"
+
+# 5. Criar o gráfico de coluna empilhada em 100% e inverter os eixos
+gg <- ggplot(plot_data, aes(x = Proporcao, 
+                             y = Atributo, 
+                             fill = Status)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_x_continuous(labels = scales::percent) +
+  labs(
+    title = "Proporção de Valores Omissos por Atributo",
+    x = "Proporção (%)",
+    y = "Atributos") +
+  scale_fill_manual(values = c("ProporcaoOmissos" = cor_omisso, "Presentes" = cor_presente), 
+                    labels = c("Valores Presentes", "Valores Omissos")) +
+  theme_minimal() + 
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 14, face = "bold", color = "black", angle = 90),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    panel.grid.major = element_line(color = "grey85"),
+    panel.grid.minor = element_blank())
+
+# 6. Converter o gráfico ggplot em um gráfico interativo com plotly
+interactive_plot <- ggplotly(gg)
+
+# 7. Mostrar o gráfico interativo
+interactive_plot
+```
+
+# Evolução Temporal do Indicador no Estado de MT
+
+## 1. Extração da Variável de Interesse
+
+A variável 'datavar' contém o consumo per capita de água em litros por habitante por dia.
+
+```{r}
+datavar = san_roo$Consumo_agua_percapita
+```
+
+## 2. Armazenamento do Dataset Completo
+
+A variável 'data' recebe o dataset 'san' completo. \# Isso permite o uso de todos os dados na análise subsequente.
+
+```{r}
+data = san_roo
+```
+
+## 3. Definição da Legenda para Gráficos
+
+Define a legenda para as visualizações que utilizam a variável 'datavar'. A legenda indica que a variável representa o "Consumo Percapita de Água" em litros por habitante por dia.
+
+```{r}
+legendavar = 'Consumo Percapita de Água (1/hab/dia)'
+```
+
+```{r}
+chave = 'media'
+```
+
+## 4. Funções de Suporte para Gráficos
+
+```{r}
+# Função para limpar strings, removendo espaços, caracteres especiais e acentos
+cleanStr <- function(string) {
+  
+  # Carregar pacotes necessários apenas uma vez
+  if (!require(stringi)) install.packages("stringi", quietly = TRUE)
+  if (!require(stringr)) install.packages("stringr", quietly = TRUE)
+  
+  # Limpar e normalizar a string
+  string <- str_replace_all(string, ' ', '_')
+  string <- str_replace_all(string, '-', '_')
+  string <- str_replace_all(string, '%', '')
+  string <- str_replace_all(string, '/', '_')
+  string <- stri_trans_general(string, "latin-ascii")
+  string <- tolower(string)
+  
+  return(string)
+}
+```
+
+## 5. Definir Tema Personalizado para Gráficos (ggplot2)
+
+```{r}
+#Definindo gráfico
+tema_plot <- function(dataTime, legendavar, chave) {
+  
+  # Criar gráfico básico de linha com o tema minimalista
+  plot <- ggplot(data = dataTime, aes(x = tempo, y = x, group = 1)) +
+            geom_line(color = "#006400", size = 1.2) +  # Linha na cor verde-escura
+            geom_label(aes(label = label), size = 3, color = "#006400", nudge_y = 0.5) +  # Rótulos em verde-escuro
+            labs(
+              title = "Evolução Temporal de Rondonópolis (MT)",
+              subtitle = legendavar,
+              x = "Ano",  # Legenda para o eixo X
+              y = legendavar  # Legenda para o eixo Y
+            ) +
+            scale_x_continuous(
+            breaks = seq(from = min(dataTime$tempo), to = max(dataTime$tempo), by = 1),
+              limits = c(min(dataTime$tempo), max(dataTime$tempo)),
+              expand = c(0, 0)  # Remover margens extras
+              ) +
+            scale_color_distiller(palette = "Greens", direction = 1) +  # Paleta de cores Greens
+            theme_minimal() %+replace%  # Manter um tema minimalista com os eixos
+            theme(
+              axis.title.x = element_text(size = 10, face = "bold", color = "black"),  # Legenda do eixo X
+              axis.title.y = element_text(size = 10, face = "bold", color = "black", angle = 90),  # Legenda Y na vertical
+              axis.text.x = element_text(size = 10, angle = 45, hjust = 1),  # Texto do eixo X com rotação
+              axis.text.y = element_text(size = 10),  # Texto do eixo Y
+              plot.title = element_text(size = 14, face = "bold", hjust = 0.5),  # Título centralizado
+              plot.subtitle = element_text(size = 12, hjust = 0.5),  # Subtítulo centralizado
+              panel.grid.major = element_line(color = "grey85"),  # Linhas de grid principais
+              panel.grid.minor = element_blank(),  # Remover grid secundário
+              legend.position = "none"  # Sem legenda adicional
+            )
+  
+  # Agregar escala Y caso solicitado
+  if (chave == 'agregar') {
+    plot <- plot + scale_y_continuous(limits = range(dataTime$x, na.rm = TRUE))
+  }
+  
+  # Salvar o gráfico em um arquivo PNG
+  ggsave(
+    filename = paste0('tempo_', cleanStr(legendavar), '.png'), 
+    plot = plot, 
+    path = 'resultados',
+    width = 8,
+    height = 4,
+    units = 'in')
+  
+  # Converta o gráfico ggplot em um gráfico interativo
+  plot_interativo <- ggplotly(plot)
+  
+  return(plot_interativo)
+}
+```
+
+```{r}
+dev01 <- function(data, datavar, chave, legendavar) {
+  
+  if (chave == 'agregar') {
+    # agregar valores
+    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = sum)
+  } else if (chave == 'media') {
+    # tirar media valores
+    dataTime = aggregate(datavar, by = list(tempo = as.numeric(data$`Ano de Referência`)), FUN = mean)
+    dataTime$x = round(dataTime$x, 2)
+  } else {
+    stop("Chave não encontrada! Tente 'agregar' ou 'media'.")
+  }
+  
+  # label
+  dataTime$label <- NA
+  n <- min(5, nrow(dataTime)) #Seleciona no máximo 5 pontos
+  idx <- seq(1, nrow(dataTime), length.out = n)
+  dataTime$label[idx] <- dataTime$x[idx]
+  
+  # A coluna 'x' precisa ser definida aqui
+  colnames(dataTime)[2] <- "x"  # Renomeia a coluna para 'x'
+  
+  # gráfico
+  plot = tema_plot(dataTime, legendavar, chave)
+  return(plot)
+}
+```
+
+## 6. Processar Dados e Gerar Gráficos
+
+```{r}
+# executar funcao
+dev01(san_roo, san_roo$Pop_atendida_abas_agua, 'media','Pop. com Abastecimento de Água')
+
+dev01(san_roo, san_roo$Consumo_agua_percapita, 'agregar','Consumo Percapita de Água (l-hab-dia)')
+
+dev01(san_roo, san_roo$Índice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
+
+dev01(san_roo, san_roo$Índice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
+
+dev01(san_roo, san_roo$Volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
+```
+  
