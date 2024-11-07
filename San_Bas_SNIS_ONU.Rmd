@@ -70,14 +70,16 @@ Esses pacotes garantem uma base sólida para o carregamento, manipulação e vis
 Os dados utilizados neste estudo foram extraídos do Sistema Nacional de Informações sobre Saneamento (SNIS) e estão hospedados em um repositório do GitHub. Para assegurar a reprodutibilidade, o código carrega diretamente o arquivo CSV a partir da URL fornecida.
 
 -   **Fonte dos Dados**: Repositório GitHub da pesquisadora.
--   **Formato do Arquivo**: Arquivo CSV com separador `;` e codificação `ISO-8859-1`, que permite a leitura correta de caracteres em português.
+-   **Formato do Arquivo**: Arquivo CSV com separador `;` e codificação `ISO-8859-1`, que permite a leitura correta de caracteres em português.  
+
 
 ```{r}
 url <- "https://github.com/CamilyNunes/Produto_San_Bas_Roo/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/Agregado-20240925161723-SNISMT.csv"  
 
 san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
 ```
-   
+     
+       
 ## 3. 3 Tratamento dos Dados
 
 Após o carregamento, realizamos o tratamento dos dados para selecionar as colunas de interesse e garantir que os indicadores relevantes para o estudo estejam bem organizados. Esse processo inclui a seleção das variáveis de saneamento e o filtro para a cidade de Rondonópolis.
@@ -103,6 +105,7 @@ san$Consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
 san$Índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
 san$Índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
 san$Volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado` 
+san$Volume_esgoto_tratado <- san_mt$`ES006 - Volume de esgotos tratado`
 ```
 
 -   **Filtragem por Município:**
@@ -357,8 +360,6 @@ dev01(san_roo, san_roo$Pop_atendida_abas_agua, 'media','Pop. com Abastecimento d
 # Meta 6.1
   
 Proporção da população que utiliza serviços de água potável geridos de forma segura (6.1.1)  
-  
-
 
 ```{r}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
@@ -405,7 +406,41 @@ san_bas_meta <- san_bas %>%
   mutate(perc_pop_atendida = (Pop_atendida_abas_agua / Populacao) * 100)
 ```
   
-    
+# Meta 6.2    
+  
+```{r}
+dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media','Volume Esgoto Tratado')
+```
+  
+
+Proporção da população que utiliza (a) serviços de saneamento geridos de forma segura e (b) uma instalação de lavagem de mãos com água e sabão (6.2.1)       
+  
+Para a instalação de lavagem de mãos com água e sabão (indicador 6.2.1), o SNIS não fornece uma variável direta sobre isso, mas você poderia utilizar informações sobre a cobertura de água e esgoto para inferir o acesso a essas instalações. No caso de dados específicos, seria necessário buscar indicadores complementares ou realizar estudos mais detalhados.  
+  
+Considerando a população atendida por esgoto tratado como indicador principal de saneamento seguro. Para calcular a proporção da população com acesso a saneamento seguro, com base nas variáveis existentes no SNIS: 
+
+
+
+
+Ou seja, a fórmula calcula a percentagem da população do município que tem acesso a esgoto tratado, considerando que o saneamento seguro é caracterizado pelo tratamento adequado do esgoto.  
+
+Variáveis para usar no cálculo:
+populacao_total: A população total do município (variável com dados gerais).
+populacao_atendida_esgoto_tratado: A população que é atendida com esgoto tratado (variável específica para o serviço de esgoto).  
+  
+```{r}
+# Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
+san_meta <- san_roo %>%
+  dplyr::filter(`Ano` >= 2001 & `Ano` <= 2021) %>%
+  dplyr::select(`Ano`, `Volume_esgoto_tratado`) %>%
+  dplyr::mutate(Volume_esgoto_tratado = as.numeric(gsub("[.,]", "", Volume_esgoto_tratado)))
+```
+  
+```{r}
+san_seguro <- san_bas %>%
+  mutate(perc_esgoto_tratado = (Volume_esgoto_tratado/Populacao) * 100)
+```
+   
     
 ```{r}
 dev01(san_roo, san_roo$Consumo_agua_percapita, 'agregar','Consumo Percapita de Água (l-hab-dia)')
