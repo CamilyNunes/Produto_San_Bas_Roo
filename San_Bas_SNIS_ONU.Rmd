@@ -402,7 +402,7 @@ san_bas <- inner_join(san_meta, pop_total, "Ano")
 
 ```{r}
 # Criar nova coluna com a divisão de Pop_atendida_abas_agua por populacao
-san_bas_meta <- san_bas %>%
+san_bas_meta61 <- san_bas %>%
   mutate(perc_pop_atendida = (Pop_atendida_abas_agua / Populacao) * 100)
 ```
   
@@ -413,7 +413,10 @@ dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media','Volume Esgoto Tratado')
 ```
   
 
-Proporção da população que utiliza (a) serviços de saneamento geridos de forma segura e (b) uma instalação de lavagem de mãos com água e sabão (6.2.1)       
+Proporção da população que utiliza   
+  
+(a) serviços de saneamento geridos de forma segura e   
+(b) uma instalação de lavagem de mãos com água e sabão (6.2.1)       
   
 Para a instalação de lavagem de mãos com água e sabão (indicador 6.2.1), o SNIS não fornece uma variável direta sobre isso, mas você poderia utilizar informações sobre a cobertura de água e esgoto para inferir o acesso a essas instalações. No caso de dados específicos, seria necessário buscar indicadores complementares ou realizar estudos mais detalhados.  
   
@@ -430,17 +433,84 @@ populacao_atendida_esgoto_tratado: A população que é atendida com esgoto trat
   
 ```{r}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
-san_meta <- san_roo %>%
+san_meta62 <- san_roo %>%
   dplyr::filter(`Ano` >= 2001 & `Ano` <= 2021) %>%
   dplyr::select(`Ano`, `Volume_esgoto_tratado`) %>%
   dplyr::mutate(Volume_esgoto_tratado = as.numeric(gsub("[.,]", "", Volume_esgoto_tratado)))
 ```
-  
+     
 ```{r}
-san_seguro <- san_bas %>%
+san_meta62a <- inner_join(san_meta62, pop_total, "Ano")
+```
+       
+```{r}
+san_seguro62a <- san_meta62a %>%
   mutate(perc_esgoto_tratado = (Volume_esgoto_tratado/Populacao) * 100)
 ```
+  
+b)  
+    
+O pacote PNADcIBGE
+O pacote PNADcIBGE foi desenvolvido para facilitar o download, importação e análise dos dados amostrais da Pesquisa Nacional por Amostra de Domicílios Contínua realizada pelo Instituto Brasileiro de Geografia e Estatística - IBGE.
+
+A PNAD Contínua possui três tipos de microdados:
+Trimestral, que contém a parte básica investigada pela pesquisa, contendo variáveis conjunturais de mercado de trabalho referentes a um trimestre civil;
+Anual acumulados em determinada visita, que contém temas e tópicos suplementares pesquisados ao longo do ano em determinada visita;
+Anual concentrados em determinado trimestre, que contém temas e tópicos suplementares pesquisados em trimestres específicos do ano.
+Além disso, a partir de 2021 foram incluídos módulos aplicados somente para um morador selecionado na PNAD Contínua, para temas e tópicos suplementares específicos.
+Maiores informações sobre a pesquisa e os temas investigados podem ser encontradas no site oficial do IBGE.
+
+Através do objeto criado com este pacote, é possível utilizar o pacote survey para realizar análises considerando o efeito do esquema de seleção utilizado no plano amostral complexo da pesquisa e calcular corretamente as medidas de erro das estimativas, considerando o estimador de pós-estratificação utilizado na pesquisa.
+
+Instalação do pacote
+O Pacote está disponível no repositório CRAN do R, onde pode ser acessada sua documentação. Tais informações também podem ser acessadas pelo repositório no GitHub do mantenedor do pacote através do endereço: https://github.com/Gabriel-Assuncao/PNADcIBGE.
+É importante sempre conferir se a versão instalada em seu computador é a mais recente disponível no CRAN.
+A instalação do pacote pode ser feita pelo seguinte comando:
+
+```{r}
+install.packages("PNADcIBGE")
+```
+
+Antes de utilizar o pacote é necessário carregá-lo no R através do comando:
+
+```{r}
+library(PNADcIBGE) 
+```
    
+Baixar os dados da PNAD Contínua: Você pode baixar os microdados da PNAD Contínua de acordo com o ano e o trimestre de interesse. 
+
+```{r}
+#Acessar os dados para o ano de 2022:
+pnad_data <- get_pnadc(year = 2022, quarter = 1) 
+```   
+   
+```{r}
+install.packages("survey")
+
+
+library(survey)
+```
+    
+```{r}
+# Filtrando os dados para o município de Rondonópolis
+rondonopolis_data <- pnad_data %>%
+  filter(codigo_municipio == 5102102)
+```
+     
+      
+```{r}
+# Suponha que a variável seja 'lavagem_maos' para acesso a instalações de lavagem de mãos
+acesso_lavagem <- pnad_data %>%
+  filter(!is.na(lavagem_maos)) %>%
+  summarise(proporcao_acesso = mean(lavagem_maos == "sim"))
+```
+
+       
+             
+
+  
+    
+       
     
 ```{r}
 dev01(san_roo, san_roo$Consumo_agua_percapita, 'agregar','Consumo Percapita de Água (l-hab-dia)')
