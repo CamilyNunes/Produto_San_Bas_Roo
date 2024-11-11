@@ -20,7 +20,7 @@ knitr::include_graphics("https://ufr.edu.br/protic/wp-content/uploads/2022/04/PR
 
 # 1. Intro
 
-O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030. Este artigo avalia o progresso do município de Rondonópolis, Mato Grosso, em relação às metas estabelecidas pelo ODS 6, observando indicadores específicos para identificar avanços e áreas que demandam maior atenção.
+O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030.Visto isso, este artigo avalia o progresso do município de Rondonópolis, Mato Grosso, em relação às metas estabelecidas pelo ODS 6, observando indicadores específicos para identificar avanços e áreas que demandam maior atenção.
 
 # 2. Objetivo
 
@@ -70,16 +70,14 @@ Esses pacotes garantem uma base sólida para o carregamento, manipulação e vis
 Os dados utilizados neste estudo foram extraídos do Sistema Nacional de Informações sobre Saneamento (SNIS) e estão hospedados em um repositório do GitHub. Para assegurar a reprodutibilidade, o código carrega diretamente o arquivo CSV a partir da URL fornecida.
 
 -   **Fonte dos Dados**: Repositório GitHub da pesquisadora.
--   **Formato do Arquivo**: Arquivo CSV com separador `;` e codificação `ISO-8859-1`, que permite a leitura correta de caracteres em português.  
-
+-   **Formato do Arquivo**: Arquivo CSV com separador `;` e codificação `ISO-8859-1`, que permite a leitura correta de caracteres em português.
 
 ```{r}
 url <- "https://github.com/CamilyNunes/Produto_San_Bas_Roo/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/Agregado-20240925161723-SNISMT.csv"  
 
 san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
 ```
-     
-       
+
 ## 3. 3 Tratamento dos Dados
 
 Após o carregamento, realizamos o tratamento dos dados para selecionar as colunas de interesse e garantir que os indicadores relevantes para o estudo estejam bem organizados. Esse processo inclui a seleção das variáveis de saneamento e o filtro para a cidade de Rondonópolis.
@@ -98,8 +96,8 @@ Selecionar colunas de interesse:
 # selecionar variaveis de referencia
 san <- san_mt[,c(1:10)]
 ```
-    
-```{r}   
+
+```{r}
 san$Pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
 san$Consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
 san$Índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
@@ -208,17 +206,16 @@ interactive_plot <- ggplotly(gg)
 # 7. Mostrar o gráfico interativo
 interactive_plot
 ```
-  
-    
+
 O gráfico acima permite identificar rapidamente as variáveis com valores ausentes. As variáveis com maiores proporções de omissão indicam potenciais lacunas nos dados do SNIS, que devem ser consideradas nas interpretações dos resultados.
 
 ```{r}
 # Remove as linhas com valores ausentes
 san_roo <- san_roo[complete.cases(san_roo),] 
 ```
-  
+
 Para lidar com os valores ausentes, adotamos a remoção das linhas com 60% ou mais de dados faltantes, pois as informações disponíveis nesses casos eram insuficientes para análise confiável. Essa abordagem evita vieses decorrentes de imputações em variáveis com grandes proporções de omissão.
-    
+
 ```{r}
 # 1. Extração da Variável de Interesse
 # A variável 'datavar' contém o consumo per capita de água em litros por habitante por dia.
@@ -237,7 +234,6 @@ legendavar <- 'Consumo Percapita de Água (1/hab/dia)'
 # Definição de chave para a média
 chave <- 'media'
 ```
-
 
 ## 4. Funções de Suporte para Gráficos
 
@@ -347,19 +343,37 @@ dev01 <- function(data, datavar, chave, legendavar) {
 }
 ```
 
-## 6. Processar Dados e Gerar Gráficos
+# Água Potável e Saneamento
 
-## 6.1 Até 2030, alcançar o acesso universal e equitativo a água potável e segura para todos.
+Garantir disponibilidade e manejo sustentável da água e saneamento para todos
 
-Ao longo dos anos, houve um aumento de habitantes de rondonópolis com abastecimento de água, saindo de 145.600 habitantes em 2000 a 244.911 em 2022.
+## Meta 6.1
+
+Até 2030, alcançar o acesso universal e equitativo a água potável e segura para todos.
+
+Em relação ao múnicipio de Rondonópolis é possível acompanhar a seríe hístorica de abastecimento de água durante o periodo de 2000 a 2022, como é apresentado no gráfico a seguir, apresentando um aumento de habitantes de rondonópolis com abastecimento de água, saindo de 145.600 habitantes em 2000 a 244.911 em 2022.
 
 ```{r}
 dev01(san_roo, san_roo$Pop_atendida_abas_agua, 'media','Pop. com Abastecimento de Água')
 ```
 
-# Meta 6.1
-  
-Proporção da população que utiliza serviços de água potável geridos de forma segura (6.1.1)  
+# Meta 6.1.1: Proporção da População com Água Potável
+
+Na seção, estamos realizando uma análise para calcular a proporção da população de Rondonópolis que tem acesso a água potável gerida de forma segura, utilizando dados do município e da população. O objetivo é verificar o percentual da população atendida por serviços de água potável que são gerenciados de maneira segura ao longo dos anos.
+
+O Indicador 6.1.1 mensura a proporção da população que utiliza serviços de água potável gerenciados de forma segura. A definição de "seguro" para o abastecimento de água envolve:
+
+-   Fonte aprimorada de água: Isso inclui redes gerais de distribuição de água, poços artesianos, poços rasos protegidos, nascentes protegidas e até mesmo água de chuva armazenada.
+
+-   Localização da água: A água deve estar disponível no domicílio ou na propriedade do residente.
+
+-   Disponibilidade e segurança: A água deve ser disponível conforme a necessidade da população e livre de contaminação fecal ou química.
+
+A seguir, detalhamos as etapas envolvidas nesse processo.
+
+## 1. Filtragem e Preparação dos Dados
+
+O primeiro passo é filtrar os dados para o intervalo de anos de interesse (2001 a 2021) e selecionar as colunas relevantes, como o ano e a quantidade de população atendida por serviços de água potável. A coluna de população atendida pode conter caracteres especiais, como vírgulas ou pontos, que são removidos para garantir que a variável seja numérica. Este é o código utilizado:
 
 ```{r}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
@@ -369,9 +383,9 @@ san_meta <- san_roo %>%
   dplyr::mutate(Pop_atendida_abas_agua = as.numeric(gsub("[.,]", "", Pop_atendida_abas_agua)))
 ```
 
-Coletar os Dados da API SIDRA
+## 2. Coleta de Dados de População
 
-Vamos usar o código da tabela 6579, que traz estimativas anuais de população. Aqui está o código para extrair os dados:
+Para calcular a proporção, também precisamos dos dados de população total de Rondonópolis, que são extraídos da API SIDRA do IBGE. O código utiliza o código da tabela 6579, que fornece estimativas anuais de população:
 
 ```{r}
 # URL da API do SIDRA para população de Rondonópolis
@@ -382,9 +396,9 @@ resposta <- GET(url)
 populacao_rondonopolis <- fromJSON(content(resposta, "text"))
 ```
 
-Preparar os Dados
+## 3. Preparação dos Dados de População
 
-Normalmente, a estrutura de dados do SIDRA inclui várias colunas além das que você precisa. Neste caso, vamos focar nos dados de ano e população para estruturar a série temporal:
+A resposta da API do SIDRA contém várias colunas, mas estamos interessados apenas nas colunas de ano e população total. As colunas são extraídas e convertidas para o formato numérico:
 
 ```{r}
 # Selecionar colunas relevantes, incluindo o código do município
@@ -394,7 +408,9 @@ pop_total <- populacao_rondonopolis %>%
          Populacao = as.numeric(Populacao))
 ```
 
-Juntar dataframe "san_meta" e "pop_total" e realizar a metrica da meta 6
+## 4. Unindo os Dados e Calculando a Proporção
+
+Com os dados de população de Rondonópolis e os dados de atendimento por água potável já preparados, unimos as duas fontes de informação com base no ano. Em seguida, calculamos a proporção da população atendida por serviços de água potável, dividindo o número de pessoas atendidas pela população total de cada ano e multiplicando por 100 para obter o percentual:
 
 ```{r}
 san_bas <- inner_join(san_meta, pop_total, "Ano")
@@ -402,35 +418,56 @@ san_bas <- inner_join(san_meta, pop_total, "Ano")
 
 ```{r}
 # Criar nova coluna com a divisão de Pop_atendida_abas_agua por populacao
-san_bas_meta61 <- san_bas %>%
+indicador_6_1_1 <- san_bas %>%
   mutate(perc_pop_atendida = (Pop_atendida_abas_agua / Populacao) * 100)
 ```
+
+## 5. Resultado Esperado
+
+O resultado final dessa análise será uma nova coluna chamada perc_pop_atendida, que representa a porcentagem da população atendida por água potável gerida de forma segura para cada ano entre 2001 e 2021. Com isso, conseguimos observar como essa proporção variou ao longo do tempo e avaliar o progresso da cidade em relação à meta 6.1 da ODS 6, que busca garantir acesso universal e equitativo à água potável até 2030.
+
+Essa análise é importante porque nos permite verificar não apenas o número de pessoas atendidas, mas também a evolução dessa cobertura ao longo dos anos, fornecendo uma visão crítica sobre os avanços ou lacunas na implementação de políticas públicas de saneamento.
   
-# Meta 6.2    
-  
+####### teste ####    
+        
+```{r}
+install.packages()
+```
+         
+          
+          
+```{r}
+library(PNADcIBGE) # CRAN v0.7.0
+library(survey) # CRAN v4.0
+library(convey) # CRAN v0.2.3
+library(magrittr) # CRAN v2.0.1 
+```
+       
+        
+        
+        
+        
+        
+        
+# Meta 6.2 - Até 2030, alcançar o acesso a saneamento e higiene adequados e equitativos para todos, e acabar com a defecação a céu aberto, com especial atenção para as necessidades das mulheres e meninas e daqueles em situação de vulnerabilidade.
+
 ```{r}
 dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media','Volume Esgoto Tratado')
 ```
-  
 
-Proporção da população que utiliza   
-  
-(a) serviços de saneamento geridos de forma segura e   
-(b) uma instalação de lavagem de mãos com água e sabão (6.2.1)       
-  
-Para a instalação de lavagem de mãos com água e sabão (indicador 6.2.1), o SNIS não fornece uma variável direta sobre isso, mas você poderia utilizar informações sobre a cobertura de água e esgoto para inferir o acesso a essas instalações. No caso de dados específicos, seria necessário buscar indicadores complementares ou realizar estudos mais detalhados.  
-  
-Considerando a população atendida por esgoto tratado como indicador principal de saneamento seguro. Para calcular a proporção da população com acesso a saneamento seguro, com base nas variáveis existentes no SNIS: 
+Proporção da população que utiliza
 
+(a) serviços de saneamento geridos de forma segura e\
+(b) uma instalação de lavagem de mãos com água e sabão (6.2.1)
 
+Para a instalação de lavagem de mãos com água e sabão (indicador 6.2.1), o SNIS não fornece uma variável direta sobre isso, mas você poderia utilizar informações sobre a cobertura de água e esgoto para inferir o acesso a essas instalações. No caso de dados específicos, seria necessário buscar indicadores complementares ou realizar estudos mais detalhados.
 
+Considerando a população atendida por esgoto tratado como indicador principal de saneamento seguro. Para calcular a proporção da população com acesso a saneamento seguro, com base nas variáveis existentes no SNIS:
 
-Ou seja, a fórmula calcula a percentagem da população do município que tem acesso a esgoto tratado, considerando que o saneamento seguro é caracterizado pelo tratamento adequado do esgoto.  
+Ou seja, a fórmula calcula a percentagem da população do município que tem acesso a esgoto tratado, considerando que o saneamento seguro é caracterizado pelo tratamento adequado do esgoto.
 
-Variáveis para usar no cálculo:
-populacao_total: A população total do município (variável com dados gerais).
-populacao_atendida_esgoto_tratado: A população que é atendida com esgoto tratado (variável específica para o serviço de esgoto).  
-  
+Variáveis para usar no cálculo: populacao_total: A população total do município (variável com dados gerais). populacao_atendida_esgoto_tratado: A população que é atendida com esgoto tratado (variável específica para o serviço de esgoto).
+
 ```{r}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
 san_meta62 <- san_roo %>%
@@ -438,80 +475,18 @@ san_meta62 <- san_roo %>%
   dplyr::select(`Ano`, `Volume_esgoto_tratado`) %>%
   dplyr::mutate(Volume_esgoto_tratado = as.numeric(gsub("[.,]", "", Volume_esgoto_tratado)))
 ```
-     
+
 ```{r}
 san_meta62a <- inner_join(san_meta62, pop_total, "Ano")
 ```
-       
+
 ```{r}
 san_seguro62a <- san_meta62a %>%
   mutate(perc_esgoto_tratado = (Volume_esgoto_tratado/Populacao) * 100)
 ```
-  
-b)  
-    
-O pacote PNADcIBGE
-O pacote PNADcIBGE foi desenvolvido para facilitar o download, importação e análise dos dados amostrais da Pesquisa Nacional por Amostra de Domicílios Contínua realizada pelo Instituto Brasileiro de Geografia e Estatística - IBGE.
 
-A PNAD Contínua possui três tipos de microdados:
-Trimestral, que contém a parte básica investigada pela pesquisa, contendo variáveis conjunturais de mercado de trabalho referentes a um trimestre civil;
-Anual acumulados em determinada visita, que contém temas e tópicos suplementares pesquisados ao longo do ano em determinada visita;
-Anual concentrados em determinado trimestre, que contém temas e tópicos suplementares pesquisados em trimestres específicos do ano.
-Além disso, a partir de 2021 foram incluídos módulos aplicados somente para um morador selecionado na PNAD Contínua, para temas e tópicos suplementares específicos.
-Maiores informações sobre a pesquisa e os temas investigados podem ser encontradas no site oficial do IBGE.
+b)  uma instalação de lavagem de mãos com água e sabão
 
-Através do objeto criado com este pacote, é possível utilizar o pacote survey para realizar análises considerando o efeito do esquema de seleção utilizado no plano amostral complexo da pesquisa e calcular corretamente as medidas de erro das estimativas, considerando o estimador de pós-estratificação utilizado na pesquisa.
-
-Instalação do pacote
-O Pacote está disponível no repositório CRAN do R, onde pode ser acessada sua documentação. Tais informações também podem ser acessadas pelo repositório no GitHub do mantenedor do pacote através do endereço: https://github.com/Gabriel-Assuncao/PNADcIBGE.
-É importante sempre conferir se a versão instalada em seu computador é a mais recente disponível no CRAN.
-A instalação do pacote pode ser feita pelo seguinte comando:
-
-```{r}
-install.packages("PNADcIBGE")
-```
-
-Antes de utilizar o pacote é necessário carregá-lo no R através do comando:
-
-```{r}
-library(PNADcIBGE) 
-```
-   
-Baixar os dados da PNAD Contínua: Você pode baixar os microdados da PNAD Contínua de acordo com o ano e o trimestre de interesse. 
-
-```{r}
-#Acessar os dados para o ano de 2022:
-pnad_data <- get_pnadc(year = 2022, quarter = 1) 
-```   
-   
-```{r}
-install.packages("survey")
-
-
-library(survey)
-```
-    
-```{r}
-# Filtrando os dados para o município de Rondonópolis
-rondonopolis_data <- pnad_data %>%
-  filter(codigo_municipio == 5102102)
-```
-     
-      
-```{r}
-# Suponha que a variável seja 'lavagem_maos' para acesso a instalações de lavagem de mãos
-acesso_lavagem <- pnad_data %>%
-  filter(!is.na(lavagem_maos)) %>%
-  summarise(proporcao_acesso = mean(lavagem_maos == "sim"))
-```
-
-       
-             
-
-  
-    
-       
-    
 ```{r}
 dev01(san_roo, san_roo$Consumo_agua_percapita, 'agregar','Consumo Percapita de Água (l-hab-dia)')
 
