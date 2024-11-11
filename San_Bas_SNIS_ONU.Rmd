@@ -20,7 +20,13 @@ knitr::include_graphics("https://ufr.edu.br/protic/wp-content/uploads/2022/04/PR
 
 # 1. Intro
 
-O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030.Visto isso, este artigo avalia o progresso do município de Rondonópolis, Mato Grosso, em relação às metas estabelecidas pelo ODS 6, observando indicadores específicos para identificar avanços e áreas que demandam maior atenção.
+O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030.Visto isso, este artigo avalia o progresso do município de Rondonópolis, Mato Grosso, em relação às metas estabelecidas pelo ODS 6, observando indicadores específicos disponivilisados pelo SNIS para identificar avanços e áreas que demandam maior atenção correspondentes a agua e esgoto pois metas que estão relacionadas exclusivamente a água e esgoto (saneamento) são:
+
+Meta 6.1: Acesso universal e equitativo à água potável e segura até 2030. Está focada exclusivamente no fornecimento de água potável.
+
+Meta 6.2: Acesso a saneamento e higiene adequados até 2030. Esta meta trata de saneamento, incluindo tanto o fornecimento de serviços de saneamento quanto as instalações para lavagem das mãos com água e sabão.
+
+Essas duas metas abordam diretamente o tema de água potável e saneamento (esgoto). As outras metas (6.3, 6.4, 6.5, 6.6, 6.a e 6.b) também estão relacionadas à água, mas incluem aspectos mais amplos, como gestão de recursos hídricos, qualidade da água e ecossistemas relacionados à água.
 
 # 2. Objetivo
 
@@ -96,16 +102,41 @@ Selecionar colunas de interesse:
 # selecionar variaveis de referencia
 san <- san_mt[,c(1:10)]
 ```
+   
+1. Água:   
 
 ```{r}
-san$Pop_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
-san$Consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água`
-san$Índice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
-san$Índice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
-san$Volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado` 
-san$Volume_esgoto_tratado <- san_mt$`ES006 - Volume de esgotos tratado`
+san$Pop_total_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+san$Pop_urbana_atendida_abas_agua <- san_mt$`AG026 - População urbana atendida com abastecimento de água`
+san$Pop_rural_atendida_abas_agua <- san_mt$`AG025A - População rural atendida com abastecimento de água no ano anterior ao de referência.`
+san$Consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água` 
+san$Atendimento_total_percentual <- san_mt$`IN055 - Índice de atendimento total de água`
 ```
+  
+2. Esgoto e Coleta de lixo:  
 
+```{r}   
+#6.2(a)
+san$Pop_total_atendida_esgotamento_sanitario <- san_mt$`ES001 - População total atendida com esgotamento sanitário`
+san$Pop_urbana_atendida_esgotamento_sanitario <- san_mt$`ES026 - População urbana atendida com esgotamento sanitário`
+san$Qtd_ligacoes_ativas <-san_mt$`ES002 - Quantidade de ligações ativas de esgotos` 
+
+#6.2(b)
+san$Pop_urbana_residente_esgotamento_sanitario <- san_mt$`G06B - População urbana residente do(s) município(s) com esgotamento sanitário`
+san$Indice_tratamento_esgoto_percentual <- san_mt$`IN016 - Índice de tratamento de esgoto`
+
+#outros
+san$Indice_coleta_esgoto <- san_mt$`IN015 - Índice de coleta de esgoto`
+san$Volume_esgoto_coletado_m3 <- san_mt$`ES005 - Volume de esgotos coletado`
+san$Volume_esgoto_tratado <- san_mt$`ES006 - Volume de esgotos tratado`
+``` 
+
+Diferença entre as variaveis com a descrição de 'atendida' e 'com (abastecimento)':
+
+Atendida (acesso a água potável segura): Implica não apenas a presença de um sistema de abastecimento, mas também a garantia de que a água é potável, segura e gerida adequadamente.
+
+Com abastecimento de água: Refere-se ao simples fornecimento de água, sem garantir que ela seja tratada ou que atenda aos padrões de segurança e qualidade para consumo humano.      
+    
 -   **Filtragem por Município:**
 
 A seguir, filtramos os dados para o município de Rondonópolis, que é o foco deste estudo.
@@ -144,7 +175,7 @@ Abaixo, geramos um gráfico de barra empilhada que mostra a proporção de valor
 calc_missing_proportion <- function(df) {
   missing_data <- sapply(df, function(col) {
     mean(is.na(col))
-  })
+    })
   
   missing_df <- data.frame(
     Atributo = names(missing_data),
@@ -206,12 +237,13 @@ interactive_plot <- ggplotly(gg)
 # 7. Mostrar o gráfico interativo
 interactive_plot
 ```
-
+  
+  
 O gráfico acima permite identificar rapidamente as variáveis com valores ausentes. As variáveis com maiores proporções de omissão indicam potenciais lacunas nos dados do SNIS, que devem ser consideradas nas interpretações dos resultados.
 
 ```{r}
 # Remove as linhas com valores ausentes
-san_roo <- san_roo[complete.cases(san_roo),] 
+#san_roo <- san_roo[complete.cases(san_roo),] 
 ```
 
 Para lidar com os valores ausentes, adotamos a remoção das linhas com 60% ou mais de dados faltantes, pois as informações disponíveis nesses casos eram insuficientes para análise confiável. Essa abordagem evita vieses decorrentes de imputações em variáveis com grandes proporções de omissão.
@@ -229,7 +261,7 @@ data <- san_roo
 # 3. Definição da Legenda para Gráficos
 # Define a legenda para as visualizações que utilizam a variável 'datavar'.
 # A legenda indica que a variável representa o "Consumo Percapita de Água" em litros por habitante por dia.
-legendavar <- 'Consumo Percapita de Água (1/hab/dia)'
+legendavar <- 'Consumo Percapita de Água (l/hab/dia)'
 
 # Definição de chave para a média
 chave <- 'media'
@@ -304,8 +336,7 @@ tema_plot <- function(dataTime, legendavar, chave) {
     path = 'resultados',
     width = 8,
     height = 4,
-    units = 'in'
-  )
+    units = 'in')
   
   # Converta o gráfico ggplot em um gráfico interativo
   plot_interativo <- ggplotly(plot)
@@ -352,9 +383,10 @@ Garantir disponibilidade e manejo sustentável da água e saneamento para todos
 Até 2030, alcançar o acesso universal e equitativo a água potável e segura para todos.
 
 Em relação ao múnicipio de Rondonópolis é possível acompanhar a seríe hístorica de abastecimento de água durante o periodo de 2000 a 2022, como é apresentado no gráfico a seguir, apresentando um aumento de habitantes de rondonópolis com abastecimento de água, saindo de 145.600 habitantes em 2000 a 244.911 em 2022.
-
+    
 ```{r}
-dev01(san_roo, san_roo$Pop_atendida_abas_agua, 'media','Pop. com Abastecimento de Água')
+dev01(san_roo, san_roo$Pop_total_atendida_abas_agua, 'media','Pop. total com Abastecimento de Água')
+dev01(san_roo, san_roo$Consumo_agua_percapita, 'media','Consumo Percapita de Água (l-hab-dia)')
 ```
 
 # Meta 6.1.1: Proporção da População com Água Potável
@@ -374,15 +406,22 @@ A seguir, detalhamos as etapas envolvidas nesse processo.
 ## 1. Filtragem e Preparação dos Dados
 
 O primeiro passo é filtrar os dados para o intervalo de anos de interesse (2001 a 2021) e selecionar as colunas relevantes, como o ano e a quantidade de população atendida por serviços de água potável. A coluna de população atendida pode conter caracteres especiais, como vírgulas ou pontos, que são removidos para garantir que a variável seja numérica. Este é o código utilizado:
-
+  
 ```{r}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
 san_meta <- san_roo %>%
   dplyr::filter(`Ano` >= 2001 & `Ano` <= 2021) %>%
-  dplyr::select(`Ano`, `Pop_atendida_abas_agua`) %>%
-  dplyr::mutate(Pop_atendida_abas_agua = as.numeric(gsub("[.,]", "", Pop_atendida_abas_agua)))
+  dplyr::select(
+    `Ano`, 
+    `Pop_total_atendida_abas_agua`, 
+    `Pop_urbana_atendida_abas_agua`, 
+    `Pop_rural_atendida_abas_agua`) %>%
+  dplyr::mutate(
+    Pop_total_atendida_abas_agua = as.numeric(gsub("[.,]", "", Pop_total_atendida_abas_agua)),
+    Pop_urbana_atendida_abas_agua = as.numeric(gsub("[.,]", "", Pop_urbana_atendida_abas_agua)),
+    Pop_rural_atendida_abas_agua = as.numeric(gsub("[.,]", "", Pop_rural_atendida_abas_agua))) 
 ```
-
+  
 ## 2. Coleta de Dados de População
 
 Para calcular a proporção, também precisamos dos dados de população total de Rondonópolis, que são extraídos da API SIDRA do IBGE. O código utiliza o código da tabela 6579, que fornece estimativas anuais de população:
@@ -417,82 +456,200 @@ san_bas <- inner_join(san_meta, pop_total, "Ano")
 ```
 
 ```{r}
-# Criar nova coluna com a divisão de Pop_atendida_abas_agua por populacao
-indicador_6_1_1 <- san_bas %>%
-  mutate(perc_pop_atendida = (Pop_atendida_abas_agua / Populacao) * 100)
+# Criar novas colunas com a divisão das variáveis de população atendida por abastecimento de água pela população total
+meta61 <- san_bas %>%
+  mutate(
+    Pop_total_atendida_pct = (Pop_total_atendida_abas_agua / Populacao) * 100,
+    Pop_urbana_atendida_pct = (Pop_urbana_atendida_abas_agua / Populacao) * 100,
+    Pop_rural_atendida_pct = (Pop_rural_atendida_abas_agua / Populacao) * 100)
 ```
 
+```{r}
+# gráfico de barras
+grafico_barras <- meta61 %>%
+  ggplot(aes(x = Ano)) +
+  # População total atendida
+  geom_bar(aes(y =  Pop_total_atendida_pct, fill = "Total", text = paste0(round(Pop_total_atendida_pct, 2), "%")), 
+           stat = "identity", position = "dodge", width = 0.8) +
+  # População urbana atendida
+  geom_bar(aes(y =  Pop_urbana_atendida_pct, fill = "Urbana", text = paste0(round(Pop_urbana_atendida_pct, 2), "%")), 
+           stat = "identity", position = "dodge", width = 0.8) +
+  # População rural atendida
+  geom_bar(aes(y = Pop_rural_atendida_pct, fill = "Rural", text = paste0(round(Pop_rural_atendida_pct, 2), "%")), 
+           stat = "identity", position = "dodge", width = 0.8) +
+  scale_fill_manual(values = c("Total" = "#FF9999", "Urbana" = "#66B3FF", "Rural" = "#99FF99")) +  # Definindo cores diferentes
+  labs(
+    title = "População Atendida por Abastecimento de Água",
+    x = "Ano",
+    y = "Porcentagem (%)",
+    fill = "Tipo de População"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    plot.margin = margin(1, 1, 1, 1, "cm")
+  )
+
+# Tornar o gráfico interativo
+grafico_interativo <- ggplotly(grafico_barras, tooltip = "text")
+
+# Exibir o gráfico interativo
+grafico_interativo
+
+# Salvar o gráfico como JPG na pasta "resultados"
+ggsave(
+  filename = "resultados/grafico_pop_atendida.jpg", 
+  plot = grafico_barras, 
+  width = 10, 
+  height = 6, 
+  units = "in", 
+  dpi = 300
+)
+```
+
+
+    
 ## 5. Resultado Esperado
 
 O resultado final dessa análise será uma nova coluna chamada perc_pop_atendida, que representa a porcentagem da população atendida por água potável gerida de forma segura para cada ano entre 2001 e 2021. Com isso, conseguimos observar como essa proporção variou ao longo do tempo e avaliar o progresso da cidade em relação à meta 6.1 da ODS 6, que busca garantir acesso universal e equitativo à água potável até 2030.
 
 Essa análise é importante porque nos permite verificar não apenas o número de pessoas atendidas, mas também a evolução dessa cobertura ao longo dos anos, fornecendo uma visão crítica sobre os avanços ou lacunas na implementação de políticas públicas de saneamento.
   
-####### teste ####    
-        
-```{r}
-install.packages()
-```
-         
-          
-          
-```{r}
-library(PNADcIBGE) # CRAN v0.7.0
-library(survey) # CRAN v4.0
-library(convey) # CRAN v0.2.3
-library(magrittr) # CRAN v2.0.1 
-```
-       
+
+
+
+  
+   
+   
         
         
         
         
-        
-        
-# Meta 6.2 - Até 2030, alcançar o acesso a saneamento e higiene adequados e equitativos para todos, e acabar com a defecação a céu aberto, com especial atenção para as necessidades das mulheres e meninas e daqueles em situação de vulnerabilidade.
+# Meta 6.2 - Acesso a Saneamento e Higiene Adequados até 2030  
 
-```{r}
-dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media','Volume Esgoto Tratado')
-```
+A Meta 6.2 da ODS 6 visa alcançar, até 2030, o acesso universal e equitativo a saneamento e higiene adequados para todos, com especial atenção para as necessidades de mulheres, meninas e indivíduos em situação de vulnerabilidade. Esta meta também busca erradicar a prática da defecação a céu aberto. Os indicadores para essa meta incluem:
 
-Proporção da população que utiliza
+6.2(a): Proporção da população que utiliza serviços de saneamento geridos de forma segura.
+6.2(b): Proporção da população com acesso a instalações de lavagem de mãos com água e sabão.  
+  
+## Indicador 6.2(a): Proporção da População com Saneamento Seguro
+  
+  Para calcular a proporção da população que utiliza serviços de saneamento geridos de forma segura, considera-se a população atendida com esgoto tratado como indicador de saneamento seguro.   
+    
+  No caso do Sistema Nacional de Informações sobre Saneamento (SNIS), as variáveis relevantes para esse cálculo incluem:
 
-(a) serviços de saneamento geridos de forma segura e\
-(b) uma instalação de lavagem de mãos com água e sabão (6.2.1)
+ES001: População total atendida com esgotamento sanitário: : Esta variável informa a quantidade de população que é atendida com serviços de esgoto, seja com coleta ou tratamento de esgoto.  
 
-Para a instalação de lavagem de mãos com água e sabão (indicador 6.2.1), o SNIS não fornece uma variável direta sobre isso, mas você poderia utilizar informações sobre a cobertura de água e esgoto para inferir o acesso a essas instalações. No caso de dados específicos, seria necessário buscar indicadores complementares ou realizar estudos mais detalhados.
+ES026 - População urbana atendida com esgotamento sanitário: Se você deseja analisar especificamente a população urbana, esta variável é mais indicada.
 
-Considerando a população atendida por esgoto tratado como indicador principal de saneamento seguro. Para calcular a proporção da população com acesso a saneamento seguro, com base nas variáveis existentes no SNIS:
+ES002 - Quantidade de ligações ativas de esgotos: Embora não forneça diretamente a população atendida, ela pode ser útil para entender a infraestrutura de saneamento, que é um fator importante para o atendimento com esgoto.  
 
-Ou seja, a fórmula calcula a percentagem da população do município que tem acesso a esgoto tratado, considerando que o saneamento seguro é caracterizado pelo tratamento adequado do esgoto.
+A fórmula para calcular a proporção de população com acesso a esgoto tratado é:     
 
-Variáveis para usar no cálculo: populacao_total: A população total do município (variável com dados gerais). populacao_atendida_esgoto_tratado: A população que é atendida com esgoto tratado (variável específica para o serviço de esgoto).
-
+No código abaixo, são realizadas as operações para calcular essa proporção:   
+  
 ```{r}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
-san_meta62 <- san_roo %>%
+san_meta62a <- san_roo %>%
   dplyr::filter(`Ano` >= 2001 & `Ano` <= 2021) %>%
-  dplyr::select(`Ano`, `Volume_esgoto_tratado`) %>%
-  dplyr::mutate(Volume_esgoto_tratado = as.numeric(gsub("[.,]", "", Volume_esgoto_tratado)))
+  dplyr::select(
+    `Ano`, 
+    `Pop_total_atendida_esgotamento_sanitario`, 
+    `Pop_urbana_atendida_esgotamento_sanitario`, 
+    `Qtd_ligacoes_ativas`) %>%
+  dplyr::mutate(
+    Pop_total_atendida_esgotamento_sanitario = as.numeric(gsub("[.,]", "", Pop_total_atendida_esgotamento_sanitario)),
+    Pop_urbana_atendida_esgotamento_sanitario = as.numeric(gsub("[.,]", "", Pop_urbana_atendida_esgotamento_sanitario)),
+    Qtd_ligacoes_ativas = as.numeric(gsub("[.,]", "", Qtd_ligacoes_ativas)))
 ```
+    
+```{r}
+san_meta62a <- inner_join(san_meta62a, pop_total, "Ano")
+```
+    
+```{r}
+# Criar novas colunas com a divisão das variáveis de população atendida por abastecimento de água pela população total
+san_meta621a <- san_meta62a %>%
+  mutate(
+    Pop_total_atendida_esgotamento_sanitario_pct = (Pop_total_atendida_esgotamento_sanitario / Populacao) * 100,
+    Pop_urbana_atendida_esgotamento_sanitario_pct = (Pop_urbana_atendida_esgotamento_sanitario / Populacao) * 100)
+```
+   
+```{r}
+grafico_barras <- san_meta621a %>%
+  ggplot(aes(x = Ano)) +
+  # Barra para a população total atendida por esgoto sanitário
+  geom_bar(aes(y = Pop_total_atendida_esgotamento_sanitario_pct, fill = "Total", 
+               text = paste0(round(Pop_total_atendida_esgotamento_sanitario_pct, 2), "%")), 
+           stat = "identity", position = "dodge") +
+  # Barra para a população urbana atendida por esgoto sanitário
+  geom_bar(aes(y = Pop_urbana_atendida_esgotamento_sanitario_pct, fill = "Urbana", 
+               text = paste0(round(Pop_urbana_atendida_esgotamento_sanitario_pct, 2), "%")), 
+           stat = "identity", position = "dodge") +
+  labs(
+    title = "População Atendida por Esgoto Sanitário",
+    x = "Ano",
+    y = "Porcentagem (%)",
+    fill = "Tipo de População") +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10))
+
+# Tornar o gráfico interativo
+grafico_interativo <- ggplotly(grafico_barras, tooltip = "text")
+
+# Exibir o gráfico interativo
+grafico_interativo
+
+# Salvar o gráfico como JPG na pasta "resultados"
+ggsave(
+  filename = "resultados/grafico_pop_atendida_esgoto.jpg", 
+  plot = grafico_barras, 
+  width = 10, 
+  height = 6, 
+  units = "in", 
+  dpi = 300)
+
+```
+     
+       
+##6.2(b)
+
+Indicador 6.2(b): Proporção da População com Acesso a Instalações de Lavagem de Mãos  
+
+Embora o SNIS não forneça uma variável direta sobre o acesso a instalações de lavagem de mãos com água e sabão, é possível inferir esse acesso a partir dos dados sobre cobertura de água e esgoto. O acesso a esgoto tratado pode ser um indicativo indireto de que as instalações de lavagem de mãos também estão disponíveis, já que, em geral, municípios com infraestrutura de saneamento também possuem sistemas de água e higiene adequados.
+
+A variável mais diretamente relacionada para a meta 6.2(b) seria:
+
+G06B: População urbana residente do município com esgotamento sanitário.  
+
+Embora a análise direta de instalações de lavagem de mãos exija dados complementares ou mais específicos, o acesso ao esgoto tratado pode servir como um indicador aproximado.      
+  
+Descrição das Variáveis:  
+  
+O volume de esgoto coletado (ES005) refere-se à quantidade de esgoto recolhida no sistema de saneamento, enquanto o volume de esgoto tratado (ES006) é o que passa por algum processo de tratamento antes de ser lançado no meio ambiente.
+  
+Unidades de Medida: Especifique as unidades, geralmente metros cúbicos (m³) ou litros.  
+
+
+Cálculo da Razão de Tratamento: Calcule a proporção do volume tratado em relação ao coletado
+
+
+(ES006/ES005)×100% para cada período e/ou região, o que evidencia a eficiência do sistema de tratamento.  
 
 ```{r}
-san_meta62a <- inner_join(san_meta62, pop_total, "Ano")
-```
-
-```{r}
-san_seguro62a <- san_meta62a %>%
-  mutate(perc_esgoto_tratado = (Volume_esgoto_tratado/Populacao) * 100)
-```
-
-b)  uma instalação de lavagem de mãos com água e sabão
-
-```{r}
-dev01(san_roo, san_roo$Consumo_agua_percapita, 'agregar','Consumo Percapita de Água (l-hab-dia)')
-
-dev01(san_roo, san_roo$Índice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
-
-dev01(san_roo, san_roo$Índice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
-
 dev01(san_roo, san_roo$Volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
+dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media', 'Volume Esgoto Tratado (m³)')
+
+dev01(san_roo, san_roo$Indice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
+dev01(san_roo, san_roo$Indice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
 ```
+  
+
+  
