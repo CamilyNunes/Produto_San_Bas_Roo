@@ -20,13 +20,11 @@ knitr::include_graphics("https://ufr.edu.br/protic/wp-content/uploads/2022/04/PR
 
 # 1. Intro
 
-O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030.Visto isso, este artigo avalia o progresso do município de Rondonópolis, Mato Grosso, em relação às metas estabelecidas pelo ODS 6, observando indicadores específicos disponivilisados pelo SNIS para identificar avanços e áreas que demandam maior atenção correspondentes a agua e esgoto pois metas que estão relacionadas exclusivamente a água e esgoto (saneamento) são:
+  O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030. Diante dessa meta global, este artigo se propõe a avaliar o progresso do município de Rondonópolis, no Mato Grosso, em relação às metas específicas do ODS 6. Além do objetivo de avaliação, a motivação para o estudo reflete a curiosidade de compreender o nível de alinhamento do município com essas metas, mesmo considerando a limitação de dados disponíveis. Essa visão local é essencial, pois pode tanto orientar prefeituras e unidades prestadoras de serviços (água e esgoto) em suas políticas como servir de exemplo para a adequação de outros municípios.
 
-Meta 6.1: Acesso universal e equitativo à água potável e segura até 2030. Está focada exclusivamente no fornecimento de água potável.
+  A análise prioriza as metas 6.1 e 6.2 do ODS 6, pois ambas tratam diretamente de água e saneamento, áreas centrais para o estudo das condições de saneamento básico. A Meta 6.1 visa alcançar o acesso universal e equitativo à água potável e segura até 2030, com foco no fornecimento de água de qualidade para toda a população. A Meta 6.2, por sua vez, abrange o acesso a saneamento e higiene adequados, o que inclui tanto o fornecimento de serviços de esgoto quanto a disponibilidade de instalações para lavagem das mãos com água e sabão.
 
-Meta 6.2: Acesso a saneamento e higiene adequados até 2030. Esta meta trata de saneamento, incluindo tanto o fornecimento de serviços de saneamento quanto as instalações para lavagem das mãos com água e sabão.
-
-Essas duas metas abordam diretamente o tema de água potável e saneamento (esgoto). As outras metas (6.3, 6.4, 6.5, 6.6, 6.a e 6.b) também estão relacionadas à água, mas incluem aspectos mais amplos, como gestão de recursos hídricos, qualidade da água e ecossistemas relacionados à água.
+  Essas duas metas são fundamentais para avaliar a situação de Rondonópolis no que se refere ao saneamento básico e às necessidades de infraestrutura. As outras metas do ODS 6 (6.3, 6.4, 6.5, 6.6, 6.a e 6.b) também abordam questões relacionadas à água, mas incluem aspectos mais amplos, como a gestão de recursos hídricos, qualidade ambiental e a preservação de ecossistemas hídricos. A análise destas outras metas poderá ser objeto de estudos futuros, permitindo um panorama ainda mais completo do setor de saneamento e água no município.
 
 # 2. Objetivo
 
@@ -240,13 +238,6 @@ interactive_plot
   
   
 O gráfico acima permite identificar rapidamente as variáveis com valores ausentes. As variáveis com maiores proporções de omissão indicam potenciais lacunas nos dados do SNIS, que devem ser consideradas nas interpretações dos resultados.
-
-```{r}
-# Remove as linhas com valores ausentes
-#san_roo <- san_roo[complete.cases(san_roo),] 
-```
-
-Para lidar com os valores ausentes, adotamos a remoção das linhas com 60% ou mais de dados faltantes, pois as informações disponíveis nesses casos eram insuficientes para análise confiável. Essa abordagem evita vieses decorrentes de imputações em variáveis com grandes proporções de omissão.
 
 ```{r}
 # 1. Extração da Variável de Interesse
