@@ -20,7 +20,7 @@ knitr::include_graphics("https://ufr.edu.br/protic/wp-content/uploads/2022/04/PR
 
 # 1. Intro
 
-  O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030. Diante dessa meta global, este artigo se propõe a avaliar o progresso do município de Rondonópolis, no Mato Grosso, em relação às metas específicas do ODS 6. Além do objetivo de avaliação, a motivação para o estudo reflete a curiosidade de compreender o nível de alinhamento do município com essas metas, mesmo considerando a limitação de dados disponíveis. Essa visão local é essencial, pois pode tanto orientar prefeituras e unidades prestadoras de serviços (água e esgoto) em suas políticas como servir de exemplo para a adequação de outros municípios.
+O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030. Diante dessa meta global, este artigo se propõe a avaliar o progresso do município de Rondonópolis, no Mato Grosso, em relação às metas específicas do ODS 6. Além do objetivo de avaliação, a motivação para o estudo reflete a curiosidade de compreender o nível de alinhamento do município com essas metas, mesmo considerando a limitação de dados disponíveis. Essa visão local é essencial, pois pode tanto orientar prefeituras e unidades prestadoras de serviços (água e esgoto) em suas políticas como servir de exemplo para a adequação de outros municípios.
 
   A análise prioriza as metas 6.1 e 6.2 do ODS 6, pois ambas tratam diretamente as áreas centrais para o estudo das condições de saneamento básico. A Meta 6.1 visa alcançar o acesso universal e equitativo à água potável e segura até 2030, com foco no fornecimento de água de qualidade para toda a população. A Meta 6.2, por sua vez, abrange o acesso a saneamento e higiene adequados, o que inclui tanto o fornecimento de serviços de esgoto quanto a disponibilidade de instalações para lavagem das mãos com água e sabão.
 
@@ -46,7 +46,7 @@ Para realizar a análise, utilizamos uma série de pacotes no R, essenciais para
 
 Primeiramente, verificamos se os pacotes necessários estão instalados. Caso não estejam, são instalados automaticamente.
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Lista de pacotes necessários
 pacotes <- c("ggplot2", "dplyr", "tidyr", "plotly", "readr", "zoo", "censobr", "geobr", "sf", "httr", "jsonlite")  
   
@@ -59,7 +59,7 @@ if(length(pacotes_nao_instalados)) install.packages(pacotes_nao_instalados)
 
 Após garantir que todos os pacotes estão instalados, eles são carregados no ambiente R.
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 invisible(lapply(pacotes, function(pkg) {
   if (!require(pkg, character.only = TRUE)) {
     stop(paste("Falha ao carregar o pacote:", pkg))
@@ -76,7 +76,7 @@ Os dados utilizados neste estudo foram extraídos do Sistema Nacional de Informa
 -   **Fonte dos Dados**: Repositório GitHub da pesquisadora.
 -   **Formato do Arquivo**: Arquivo CSV com separador `;` e codificação `ISO-8859-1`, que permite a leitura correta de caracteres em português.
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 url <- "https://github.com/CamilyNunes/Produto_San_Bas_Roo/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/Agregado-20240925161723-SNISMT.csv"  
 
 san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
@@ -88,7 +88,7 @@ Após o carregamento, realizamos o tratamento dos dados para selecionar as colun
 
 -   **Desabilitar Notação Científica:** Para garantir que os números não sejam representados em notação científica:
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 options(scipen = 999) 
 ```
 
@@ -96,14 +96,14 @@ options(scipen = 999)
 
 Selecionar colunas de interesse:
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # selecionar variaveis de referencia
 san <- san_mt[,c(1:10)]
 ```
    
 1. Água:   
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 san$Pop_total_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
 san$Pop_urbana_atendida_abas_agua <- san_mt$`AG026 - População urbana atendida com abastecimento de água`
 san$Pop_rural_atendida_abas_agua <- san_mt$`AG025A - População rural atendida com abastecimento de água no ano anterior ao de referência.`
@@ -113,7 +113,7 @@ san$Atendimento_total_percentual <- san_mt$`IN055 - Índice de atendimento total
   
 2. Esgoto e Coleta de lixo:  
 
-```{r}   
+```{r, warning=FALSE,echo=FALSE,message=FALSE}   
 #6.2(a)
 san$Pop_total_atendida_esgotamento_sanitario <- san_mt$`ES001 - População total atendida com esgotamento sanitário`
 san$Pop_urbana_atendida_esgotamento_sanitario <- san_mt$`ES026 - População urbana atendida com esgotamento sanitário`
@@ -139,7 +139,7 @@ Com abastecimento de água: Refere-se ao simples fornecimento de água, sem gara
 
 A seguir, filtramos os dados para o município de Rondonópolis, que é o foco deste estudo.
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Filtrando a cidade de Rondonópolis
 san_roo <- san[san$Município == "Rondonópolis", ]  
 ```
@@ -148,7 +148,7 @@ san_roo <- san[san$Município == "Rondonópolis", ]
 
 Para facilitar a interpretação, renomeamos algumas colunas, garantindo a consistência no conjunto de dados.
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Supondo que a coluna em uma das tabelas esteja com um nome diferente, renomeie para padronizar
 san_roo <- san_roo %>%
   rename(`Ano` = `Ano de Referência`)
@@ -168,7 +168,7 @@ Para garantir a consistência e confiabilidade da análise, é importante identi
 
 Abaixo, geramos um gráfico de barra empilhada que mostra a proporção de valores presentes e ausentes para cada atributo relevante. Esse gráfico indica quais variáveis precisam de atenção adicional em termos de completude de dados.
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
 calc_missing_proportion <- function(df) {
   missing_data <- sapply(df, function(col) {
@@ -239,7 +239,7 @@ interactive_plot
   
 O gráfico acima permite identificar rapidamente as variáveis com valores ausentes. As variáveis com maiores proporções de omissão indicam potenciais lacunas nos dados do SNIS, que devem ser consideradas nas interpretações dos resultados.
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # 1. Extração da Variável de Interesse
 # A variável 'datavar' contém o consumo per capita de água em litros por habitante por dia.
 datavar <- san_roo$Consumo_agua_percapita
@@ -260,7 +260,7 @@ chave <- 'media'
 
 ## 4. Funções de Suporte para Gráficos
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Função para limpar strings, removendo espaços, caracteres especiais e acentos
 cleanStr <- function(string) {
   
@@ -282,7 +282,7 @@ cleanStr <- function(string) {
 
 ## 5. Definir Tema Personalizado para Gráficos (ggplot2)
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 tema_plot <- function(dataTime, legendavar, chave) {
   
   # Criar gráfico básico de linha com o tema minimalista
@@ -336,7 +336,7 @@ tema_plot <- function(dataTime, legendavar, chave) {
 }
 ```
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 dev01 <- function(data, datavar, chave, legendavar) {
   
   if (chave == 'agregar') {
@@ -375,7 +375,7 @@ Até 2030, alcançar o acesso universal e equitativo a água potável e segura p
 
 Em relação ao múnicipio de Rondonópolis é possível acompanhar a seríe hístorica de abastecimento de água durante o periodo de 2000 a 2022, como é apresentado no gráfico a seguir, apresentando um aumento de habitantes de rondonópolis com abastecimento de água, saindo de 145.600 habitantes em 2000 a 244.911 em 2022.
     
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 dev01(san_roo, san_roo$Pop_total_atendida_abas_agua, 'media','Pop. total com Abastecimento de Água')
 dev01(san_roo, san_roo$Consumo_agua_percapita, 'media','Consumo Percapita de Água (l-hab-dia)')
 ```
@@ -398,7 +398,7 @@ A seguir, detalhamos as etapas envolvidas nesse processo.
 
 O primeiro passo é filtrar os dados para o intervalo de anos de interesse (2001 a 2021) e selecionar as colunas relevantes, como o ano e a quantidade de população atendida por serviços de água potável. A coluna de população atendida pode conter caracteres especiais, como vírgulas ou pontos, que são removidos para garantir que a variável seja numérica. Este é o código utilizado:
   
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
 san_meta <- san_roo %>%
   dplyr::filter(`Ano` >= 2001 & `Ano` <= 2021) %>%
@@ -417,7 +417,7 @@ san_meta <- san_roo %>%
 
 Para calcular a proporção, também precisamos dos dados de população total de Rondonópolis, que são extraídos da API SIDRA do IBGE. O código utiliza o código da tabela 6579, que fornece estimativas anuais de população:
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # URL da API do SIDRA para população de Rondonópolis
 url <- "https://apisidra.ibge.gov.br/values/t/6579/p/all/n6/5107602"
 
@@ -430,7 +430,7 @@ populacao_rondonopolis <- fromJSON(content(resposta, "text"))
 
 A resposta da API do SIDRA contém várias colunas, mas estamos interessados apenas nas colunas de ano e população total. As colunas são extraídas e convertidas para o formato numérico:
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Selecionar colunas relevantes, incluindo o código do município
 pop_total <- populacao_rondonopolis %>%
   select(Ano = D1N, Populacao = V) %>%
@@ -442,11 +442,11 @@ pop_total <- populacao_rondonopolis %>%
 
 Com os dados de população de Rondonópolis e os dados de atendimento por água potável já preparados, unimos as duas fontes de informação com base no ano. Em seguida, calculamos a proporção da população atendida por serviços de água potável, dividindo o número de pessoas atendidas pela população total de cada ano e multiplicando por 100 para obter o percentual:
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 san_bas <- inner_join(san_meta, pop_total, "Ano")
 ```
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Criar novas colunas com a divisão das variáveis de população atendida por abastecimento de água pela população total
 meta61 <- san_bas %>%
   mutate(
@@ -455,7 +455,7 @@ meta61 <- san_bas %>%
     Pop_rural_atendida_pct = (Pop_rural_atendida_abas_agua / Populacao) * 100)
 ```
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # gráfico de barras
 grafico_barras <- meta61 %>%
   ggplot(aes(x = Ano)) +
@@ -542,7 +542,7 @@ A fórmula para calcular a proporção de população com acesso a esgoto tratad
 
 No código abaixo, são realizadas as operações para calcular essa proporção:   
   
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
 san_meta62a <- san_roo %>%
   dplyr::filter(`Ano` >= 2001 & `Ano` <= 2021) %>%
@@ -557,11 +557,11 @@ san_meta62a <- san_roo %>%
     Qtd_ligacoes_ativas = as.numeric(gsub("[.,]", "", Qtd_ligacoes_ativas)))
 ```
     
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 san_meta62a <- inner_join(san_meta62a, pop_total, "Ano")
 ```
     
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Criar novas colunas com a divisão das variáveis de população atendida por abastecimento de água pela população total
 san_meta621a <- san_meta62a %>%
   mutate(
@@ -569,7 +569,7 @@ san_meta621a <- san_meta62a %>%
     Pop_urbana_atendida_esgotamento_sanitario_pct = (Pop_urbana_atendida_esgotamento_sanitario / Populacao) * 100)
 ```
    
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 grafico_barras <- san_meta621a %>%
   ggplot(aes(x = Ano)) +
   # Barra para a população total atendida por esgoto sanitário
@@ -634,7 +634,7 @@ Cálculo da Razão de Tratamento: Calcule a proporção do volume tratado em rel
 
 (ES006/ES005)×100% para cada período e/ou região, o que evidencia a eficiência do sistema de tratamento.  
 
-```{r}
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
 dev01(san_roo, san_roo$Volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
 dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media', 'Volume Esgoto Tratado (m³)')
 
