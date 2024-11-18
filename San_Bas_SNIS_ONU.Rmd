@@ -12,12 +12,12 @@ output:
     highlight: tango         # Destacar a sintaxe em R
     css: "estilo.css"       # Arquivo CSS personalizado    
 ---
-
+  
 ```{r capa, echo=FALSE, out.width="30%", fig.align='center'}
 # Adicione o logotipo da universidade na capa
 knitr::include_graphics("https://ufr.edu.br/protic/wp-content/uploads/2022/04/PROEXA-branco.png") # Substitua com o caminho para a imagem do logotipo
 ```
-
+    
 # 1. Intro
 
 O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030. Diante dessa meta global, este artigo se propõe a avaliar o progresso do município de Rondonópolis, no Mato Grosso, em relação às metas específicas do ODS 6. Além do objetivo de avaliação, a motivação para o estudo reflete a curiosidade de compreender o nível de alinhamento do município com essas metas, mesmo considerando a limitação de dados disponíveis. Essa visão local é essencial, pois pode tanto orientar prefeituras e unidades prestadoras de serviços (água e esgoto) em suas políticas como servir de exemplo para a adequação de outros municípios.
@@ -81,7 +81,7 @@ url <- "https://github.com/CamilyNunes/Produto_San_Bas_Roo/raw/refs/heads/main/D
 
 san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
 ```
-
+    
 ## 3. 3 Tratamento dos Dados
 
 Após o carregamento, realizamos o tratamento dos dados para selecionar as colunas de interesse e garantir que os indicadores relevantes para o estudo estejam bem organizados. Esse processo inclui a seleção das variáveis de saneamento e o filtro para a cidade de Rondonópolis.
@@ -138,10 +138,18 @@ Com abastecimento de água: Refere-se ao simples fornecimento de água, sem gara
 -   **Filtragem por Município:**
 
 A seguir, filtramos os dados para o município de Rondonópolis, que é o foco deste estudo.
-
-```{r, warning=FALSE,echo=FALSE,message=FALSE}
+ 
+```{r}
 # Filtrando a cidade de Rondonópolis
 san_roo <- san[san$Município == "Rondonópolis", ]  
+```
+
+```
+   
+  
+```{r, warning=FALSE,echo=FALSE,message=FALSE}
+# Filtrando a cidade de Rondonópolis
+san_roo <- san[san$`Código do Município` == "510760", ]  
 ```
 
 -   **Padronização das Colunas**:
