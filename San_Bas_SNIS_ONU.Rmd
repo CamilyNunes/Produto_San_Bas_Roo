@@ -1,18 +1,19 @@
 ---
 title: "Avaliação dos Avanços de Rondonópolis (MT) em Relação ao Objetivo de Desenvolvimento Sustentável 6 (ODS 6) – Água Potável e Saneamento"
-author: "Camily Nunes dos Santos"  
+author: "Camily Nunes dos Santos"
+date: "`r format(Sys.Date(), '%d de %B de %Y')`"             # Adiciona a data atual automaticamente
 output: 
   html_document:
     toc: true               # Ativa o índice
     toc_float: 
       collapsed: false      # Expande o índice automaticamente
       smooth_scroll: true   # Rolagem suave ao clicar no índice
-      position: "left"      # Posição
-    theme: cosmo            # Tema Bootstrap para o HTML
-    highlight: tango         # Destacar a sintaxe em R
-    css: "estilo.css"       # Arquivo CSS personalizado    
+      position: "left"      # Posição do índice flutuante
+    theme: paper         # Tema Bootstrap para o HTML
+    highlight: tango        # Destaca a sintaxe em R
+    css: "estilo.css"       # Arquivo CSS personalizado
 ---
-  
+    
 ```{r capa, echo=FALSE, out.width="30%", fig.align='center'}
 # Adicione o logotipo da universidade na capa
 knitr::include_graphics("https://ufr.edu.br/protic/wp-content/uploads/2022/04/PROEXA-branco.png") # Substitua com o caminho para a imagem do logotipo
@@ -238,215 +239,7 @@ interactive_plot <- ggplotly(gg)
 interactive_plot
 ```
    
-```{r}
-#teste1
-calc_missing_proportion_by_year <- function(df, year_col) {
-  # Verificar se a coluna do ano existe
-  if (!year_col %in% names(df)) {
-    stop("Coluna do ano não encontrada no conjunto de dados.")
-  }
-  
-  df %>%
-    group_by(!!sym(year_col)) %>% # Agrupa por ano
-    summarise(across(everything(), ~ mean(is.na(.)), .names = "Omissos_{.col}")) %>%
-    pivot_longer(cols = -!!sym(year_col), 
-                 names_to = "Atributo", 
-                 values_to = "Omissos") %>%
-    filter(Omissos > 0) %>%
-    mutate(Atributo = sub("Omissos_", "", Atributo)) # Limpa o nome das colunas
-}
-  
-missing_proportions_by_year <- calc_missing_proportion_by_year(san_roo, "Ano")
-  
-plot_data_by_year <- missing_proportions_by_year %>%
-  mutate(Presentes = 1 - Omissos) %>%
-  pivot_longer(cols = c(Omissos, Presentes), 
-               names_to = "Valores", 
-               values_to = "Proporcao")
-  
-gg_by_year <- ggplot(plot_data_by_year, aes(x = Ano, 
-                                            y = Proporcao, 
-                                            fill = Valores)) +
-  geom_bar(stat = "identity", position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
-  labs(
-    title = "Proporção de Valores Omissos por Ano",
-    x = "Ano",
-    y = "Proporção (%)") +
-  scale_fill_manual(values = c("Omissos" = cor_omisso, "Presentes" = cor_presente), 
-                    labels = c("Valores Presentes", "Valores Omissos")) + 
-  theme_minimal() + 
-  theme(
-    axis.title.x = element_text(size = 14, face = "bold", color = "black"),
-    axis.title.y = element_text(size = 14, face = "bold", color = "black"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    panel.grid.major = element_line(color = "grey85"),
-    panel.grid.minor = element_blank())
-  
-ggsave(
-  filename = 'grafico_proporcao_omissos_por_ano.png', 
-  plot = gg_by_year, 
-  path = 'resultados',
-  width = 10,
-  height = 6,
-  units = 'in')
-  
-interactive_plot_by_year <- ggplotly(gg_by_year)   
-  
-interactive_plot_by_year
-``` 
-  
-```{r}
-#teste2
-# 1. Calcular a proporção de valores omissos por variável e ano
-calc_missing_by_year <- function(df) {
-  # Selecionar apenas colunas numéricas e a coluna "Ano"
-  numeric_cols <- df %>%
-    select(where(is.numeric), Ano)
-  
-  # Transformar para formato longo
-  df_long <- numeric_cols %>%
-    pivot_longer(-Ano, names_to = "Variavel", values_to = "Valor") %>%
-    group_by(Ano, Variavel) %>%
-    summarise(
-      ProporcaoOmissos = mean(is.na(Valor)),
-      ProporcaoPresentes = 1 - mean(is.na(Valor)),
-      .groups = "drop"
-    )
-  return(df_long)
-}
-
-# 2. Preparar os dados para a plotagem
-missing_by_year <- calc_missing_by_year(san_roo)
-
-plot_data <- missing_by_year %>%
-  pivot_longer(cols = c(ProporcaoOmissos, ProporcaoPresentes),
-               names_to = "Tipo",
-               values_to = "Proporcao")
-
-# 3. Definir as cores
-cor_omisso <- "#FF6347"
-cor_presente <- "#006400"
-
-# 4. Criar o gráfico com ggplot
-gg <- ggplot(plot_data, aes(x = Ano, 
-                            y = Proporcao, 
-                            fill = Tipo)) +
-  geom_bar(stat = "identity", position = "fill") +
-  facet_wrap(~Variavel, scales = "free_y") +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_manual(
-    values = c("ProporcaoOmissos" = cor_omisso, "ProporcaoPresentes" = cor_presente),
-    labels = c("Valores Omissos", "Valores Presentes")
-  ) +
-  labs(
-    title = "Valores Omissos e Presentes por Variável e Ano",
-    x = "Ano",
-    y = "Proporção (%)"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.title.x = element_text(size = 14, face = "bold"),
-    axis.title.y = element_text(size = 14, face = "bold"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    legend.position = "bottom"
-  )
-
-# 5. Salvar o gráfico
-ggsave(
-  filename = "grafico_omissos_por_variavel_ano.png",
-  plot = gg,
-  path = "resultados",
-  width = 10,
-  height = 6,
-  units = "in"
-)
-
-# 6. Converter para interativo com plotly
-interactive_plot <- ggplotly(gg)
-
-# 7. Mostrar o gráfico interativo
-interactive_plot
-
-```
-
-```{r}
-#teste 5
-# 1. Calcular a proporção de valores omissos por variável e ano
-calc_missing_by_year <- function(df) {
-  # Selecionar apenas colunas numéricas e a coluna "Ano"
-  numeric_cols <- df %>%
-    select(where(is.numeric), Ano)
-  
-  # Transformar para formato longo
-  df_long <- numeric_cols %>%
-    pivot_longer(-Ano, names_to = "Variavel", values_to = "Valor") %>%
-    group_by(Ano, Variavel) %>%
-    summarise(
-      Omissos = mean(is.na(Valor)),
-      Presentes = 1 - mean(is.na(Valor)),
-      .groups = "drop")
-  
-  # Adicionar uma coluna para agrupar as variáveis em pares
-  df_long <- df_long %>%
-    mutate(Grupo = rep(1:ceiling(n_distinct(df_long$Variavel)/2), each = 2)[1:n()])
-  
-  return(df_long)
-}
-
-# 2. Preparar os dados para a plotagem
-missing_by_year <- calc_missing_by_year(san_roo)
-
-plot_data <- missing_by_year %>%
-  pivot_longer(cols = c(Omissos, Presentes),
-               names_to = "Tipo",
-               values_to = "Proporcao")
-
-# 3. Definir as cores
-cor_omisso <- "#FF6347"
-cor_presente <- "#006400"
-
-# 4. Criar o gráfico com ggplot
-gg <- ggplot(plot_data, aes(x = Ano, 
-                            y = Proporcao, 
-                            fill = Tipo)) +
-  geom_bar(stat = "identity", position = "fill") +
-  facet_wrap(~Grupo, scales = "free_y", ncol = 2) +  # Alterado para mostrar em pares (duas colunas)
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_manual(
-    values = c("Omissos" = cor_omisso, "Presentes" = cor_presente),
-    labels = c("Valores Omissos", "Valores Presentes")
-  ) +
-  labs(
-    title = "Valores Omissos e Presentes por Variável e Ano",
-    x = "Ano",
-    y = "Proporção (%)"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.title.x = element_text(size = 14, face = "bold"),
-    axis.title.y = element_text(size = 14, face = "bold"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    legend.position = "bottom")
-
-# 5. Salvar o gráfico
-ggsave(
-  filename = "grafico_omissos_por_variavel_ano.png",
-  plot = gg,
-  path = "resultados",
-  width = 10,
-  height = 6,
-  units = "in")
-
-# 6. Converter para interativo com plotly
-interactive_plot <- ggplotly(gg)
-
-# 7. Mostrar o gráfico interativo
-interactive_plot
-
-```
-
-```{r fig.width=18, fig.height=10}
+```{r fig.width=14, fig.height=10}
 #teste6
 # 1. Calcular a proporção de valores omissos por variável e ano
 calc_missing_by_year <- function(df) {
@@ -504,7 +297,7 @@ ggsave(
   filename = "grafico_omissos_por_variavel_ano.png",
   plot = gg,
   path = "resultados",
-  width = 18,  # Aumentando a largura
+  width = 16,  # Aumentando a largura
   height = 10, # Aumentando a altura
   units = "in")
 
@@ -921,6 +714,4 @@ dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media', 'Volume Esgoto Tratado (m
 dev01(san_roo, san_roo$Indice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
 dev01(san_roo, san_roo$Indice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
 ```
-  
-
   
