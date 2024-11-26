@@ -104,13 +104,14 @@ san <- san_mt[,c(1:10)]
 1. Água:   
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
-san$Pop_total_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
-san$Pop_urbana_atendida_abas_agua <- san_mt$`AG026 - População urbana atendida com abastecimento de água`
+#6.1(a)
+san$Pop_total_atendida_abas_agua <- as.numeric(as.character(san_mt$`AG001 - População total atendida com abastecimento de água`))
+san$Pop_urbana_atendida_abas_agua <- as.numeric(as.character(san_mt$`AG026 - População urbana atendida com abastecimento de água`))
 san$Pop_rural_atendida_abas_agua <- san_mt$`AG025A - População rural atendida com abastecimento de água no ano anterior ao de referência.`
 san$Consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água` 
 san$Atendimento_total_percentual <- san_mt$`IN055 - Índice de atendimento total de água`
 ```
-  
+
 2. Esgoto e Coleta de lixo:  
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}   
@@ -144,14 +145,6 @@ A seguir, filtramos os dados para o município de Rondonópolis, que é o foco d
 san_roo <- san[san$Município == "Rondonópolis", ]  
 ```
 
-```
-   
-  
-```{r, warning=FALSE,echo=FALSE,message=FALSE}
-# Filtrando a cidade de Rondonópolis
-san_roo <- san[san$`Código do Município` == "510760", ]  
-```
-
 -   **Padronização das Colunas**:
 
 Para facilitar a interpretação, renomeamos algumas colunas, garantindo a consistência no conjunto de dados.
@@ -159,7 +152,8 @@ Para facilitar a interpretação, renomeamos algumas colunas, garantindo a consi
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Supondo que a coluna em uma das tabelas esteja com um nome diferente, renomeie para padronizar
 san_roo <- san_roo %>%
-  rename(`Ano` = `Ano de Referência`)
+  rename(`Ano` = `Ano de Referência`) %>%
+  mutate(Ano = as.numeric(Ano))
 ```
 
 Esse tratamento garante que os dados estejam prontos para análise, permitindo explorar os indicadores de forma estruturada e analisar o progresso do município em relação às metas do ODS 6.
@@ -185,10 +179,10 @@ calc_missing_proportion <- function(df) {
   
   missing_df <- data.frame(
     Atributo = names(missing_data),
-    ProporcaoOmissos = missing_data)
+    Omissos = missing_data)
   
   missing_df <- missing_df %>%
-    filter(ProporcaoOmissos > 0)
+    filter(Omissos > 0)
   
   return(missing_df)
 }
@@ -198,8 +192,8 @@ missing_proportions <- calc_missing_proportion(san_roo)
 
 # 3. Preparar os dados para a plotagem em forma de gráfico de barra empilhada
 plot_data <- missing_proportions %>%
-  mutate(Presentes = 1 - ProporcaoOmissos) %>%
-  pivot_longer(cols = c(ProporcaoOmissos, Presentes), 
+  mutate(Presentes = 1 - Omissos) %>%
+  pivot_longer(cols = c(Omissos, Presentes), 
                names_to = "Valores", 
                values_to = "Proporcao")
 
@@ -214,11 +208,11 @@ gg <- ggplot(plot_data, aes(x = Proporcao,
   geom_bar(stat = "identity", position = "fill") +
   scale_x_continuous(labels = scales::percent) +
   labs(
-    title = "Proporção de Valores Omissos por Atributo",
+    title = "Proporção de Valores Omissos por Variável",
     x = "Proporção (%)",
-    y = "Atributos") +
-  scale_fill_manual(values = c("ProporcaoOmissos" = cor_omisso, "Presentes" = cor_presente), 
-                    labels = c("Valores Presentes", "Valores Omissos")) +
+    y = " ") +
+  scale_fill_manual(values = c("Omissos" = cor_omisso, "Presentes" = cor_presente), 
+                    labels = c("Valores Presentes", "Valores Omissos")) + 
   theme_minimal() + 
   theme(
     axis.title.x = element_text(size = 14, face = "bold", color = "black"),
@@ -243,8 +237,143 @@ interactive_plot <- ggplotly(gg)
 # 7. Mostrar o gráfico interativo
 interactive_plot
 ```
+   
+```{r}
+#teste1
+calc_missing_proportion_by_year <- function(df, year_col) {
+  # Verificar se a coluna do ano existe
+  if (!year_col %in% names(df)) {
+    stop("Coluna do ano não encontrada no conjunto de dados.")
+  }
   
+  df %>%
+    group_by(!!sym(year_col)) %>% # Agrupa por ano
+    summarise(across(everything(), ~ mean(is.na(.)), .names = "Omissos_{.col}")) %>%
+    pivot_longer(cols = -!!sym(year_col), 
+                 names_to = "Atributo", 
+                 values_to = "Omissos") %>%
+    filter(Omissos > 0) %>%
+    mutate(Atributo = sub("Omissos_", "", Atributo)) # Limpa o nome das colunas
+}
   
+missing_proportions_by_year <- calc_missing_proportion_by_year(san_roo, "Ano")
+  
+plot_data_by_year <- missing_proportions_by_year %>%
+  mutate(Presentes = 1 - Omissos) %>%
+  pivot_longer(cols = c(Omissos, Presentes), 
+               names_to = "Valores", 
+               values_to = "Proporcao")
+  
+gg_by_year <- ggplot(plot_data_by_year, aes(x = Ano, 
+                                            y = Proporcao, 
+                                            fill = Valores)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Proporção de Valores Omissos por Ano",
+    x = "Ano",
+    y = "Proporção (%)") +
+  scale_fill_manual(values = c("Omissos" = cor_omisso, "Presentes" = cor_presente), 
+                    labels = c("Valores Presentes", "Valores Omissos")) + 
+  theme_minimal() + 
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 14, face = "bold", color = "black"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    panel.grid.major = element_line(color = "grey85"),
+    panel.grid.minor = element_blank())
+  
+ggsave(
+  filename = 'grafico_proporcao_omissos_por_ano.png', 
+  plot = gg_by_year, 
+  path = 'resultados',
+  width = 10,
+  height = 6,
+  units = 'in')
+  
+interactive_plot_by_year <- ggplotly(gg_by_year)   
+  
+interactive_plot_by_year
+``` 
+  
+```{r}
+#teste2
+# 1. Calcular a proporção de valores omissos por variável e ano
+calc_missing_by_year <- function(df) {
+  # Selecionar apenas colunas numéricas e a coluna "Ano"
+  numeric_cols <- df %>%
+    select(where(is.numeric), Ano)
+  
+  # Transformar para formato longo
+  df_long <- numeric_cols %>%
+    pivot_longer(-Ano, names_to = "Variavel", values_to = "Valor") %>%
+    group_by(Ano, Variavel) %>%
+    summarise(
+      ProporcaoOmissos = mean(is.na(Valor)),
+      ProporcaoPresentes = 1 - mean(is.na(Valor)),
+      .groups = "drop"
+    )
+  return(df_long)
+}
+
+# 2. Preparar os dados para a plotagem
+missing_by_year <- calc_missing_by_year(san_roo)
+
+plot_data <- missing_by_year %>%
+  pivot_longer(cols = c(ProporcaoOmissos, ProporcaoPresentes),
+               names_to = "Tipo",
+               values_to = "Proporcao")
+
+# 3. Definir as cores
+cor_omisso <- "#FF6347"
+cor_presente <- "#006400"
+
+# 4. Criar o gráfico com ggplot
+gg <- ggplot(plot_data, aes(x = Ano, 
+                            y = Proporcao, 
+                            fill = Tipo)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~Variavel, scales = "free_y") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(
+    values = c("ProporcaoOmissos" = cor_omisso, "ProporcaoPresentes" = cor_presente),
+    labels = c("Valores Omissos", "Valores Presentes")
+  ) +
+  labs(
+    title = "Valores Omissos e Presentes por Variável e Ano",
+    x = "Ano",
+    y = "Proporção (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    legend.position = "bottom"
+  )
+
+# 5. Salvar o gráfico
+ggsave(
+  filename = "grafico_omissos_por_variavel_ano.png",
+  plot = gg,
+  path = "resultados",
+  width = 10,
+  height = 6,
+  units = "in"
+)
+
+# 6. Converter para interativo com plotly
+interactive_plot <- ggplotly(gg)
+
+# 7. Mostrar o gráfico interativo
+interactive_plot
+
+```
+```{r}
+sapply(san_roo, class)
+```
+
+          
 O gráfico acima permite identificar rapidamente as variáveis com valores ausentes. As variáveis com maiores proporções de omissão indicam potenciais lacunas nos dados do SNIS, que devem ser consideradas nas interpretações dos resultados.
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
