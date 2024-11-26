@@ -369,11 +369,154 @@ interactive_plot <- ggplotly(gg)
 interactive_plot
 
 ```
+
 ```{r}
-sapply(san_roo, class)
+#teste 5
+# 1. Calcular a proporção de valores omissos por variável e ano
+calc_missing_by_year <- function(df) {
+  # Selecionar apenas colunas numéricas e a coluna "Ano"
+  numeric_cols <- df %>%
+    select(where(is.numeric), Ano)
+  
+  # Transformar para formato longo
+  df_long <- numeric_cols %>%
+    pivot_longer(-Ano, names_to = "Variavel", values_to = "Valor") %>%
+    group_by(Ano, Variavel) %>%
+    summarise(
+      Omissos = mean(is.na(Valor)),
+      Presentes = 1 - mean(is.na(Valor)),
+      .groups = "drop")
+  
+  # Adicionar uma coluna para agrupar as variáveis em pares
+  df_long <- df_long %>%
+    mutate(Grupo = rep(1:ceiling(n_distinct(df_long$Variavel)/2), each = 2)[1:n()])
+  
+  return(df_long)
+}
+
+# 2. Preparar os dados para a plotagem
+missing_by_year <- calc_missing_by_year(san_roo)
+
+plot_data <- missing_by_year %>%
+  pivot_longer(cols = c(Omissos, Presentes),
+               names_to = "Tipo",
+               values_to = "Proporcao")
+
+# 3. Definir as cores
+cor_omisso <- "#FF6347"
+cor_presente <- "#006400"
+
+# 4. Criar o gráfico com ggplot
+gg <- ggplot(plot_data, aes(x = Ano, 
+                            y = Proporcao, 
+                            fill = Tipo)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~Grupo, scales = "free_y", ncol = 2) +  # Alterado para mostrar em pares (duas colunas)
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(
+    values = c("Omissos" = cor_omisso, "Presentes" = cor_presente),
+    labels = c("Valores Omissos", "Valores Presentes")
+  ) +
+  labs(
+    title = "Valores Omissos e Presentes por Variável e Ano",
+    x = "Ano",
+    y = "Proporção (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    legend.position = "bottom")
+
+# 5. Salvar o gráfico
+ggsave(
+  filename = "grafico_omissos_por_variavel_ano.png",
+  plot = gg,
+  path = "resultados",
+  width = 10,
+  height = 6,
+  units = "in")
+
+# 6. Converter para interativo com plotly
+interactive_plot <- ggplotly(gg)
+
+# 7. Mostrar o gráfico interativo
+interactive_plot
+
 ```
 
-          
+```{r fig.width=18, fig.height=10}
+#teste6
+# 1. Calcular a proporção de valores omissos por variável e ano
+calc_missing_by_year <- function(df) {
+  # Selecionar apenas colunas numéricas e a coluna "Ano"
+  numeric_cols <- df %>%
+    select(where(is.numeric), Ano)
+  
+  # Transformar para formato longo
+  df_long <- numeric_cols %>%
+    pivot_longer(-Ano, names_to = "Variavel", values_to = "Valor") %>%
+    group_by(Ano, Variavel) %>%
+    summarise(
+      Omissos = mean(is.na(Valor)),
+      Presentes = 1 - mean(is.na(Valor)),
+      .groups = "drop")
+  return(df_long)
+}
+
+# 2. Preparar os dados para a plotagem
+missing_by_year <- calc_missing_by_year(san_roo)
+
+plot_data <- missing_by_year %>%
+  pivot_longer(cols = c(Omissos, Presentes),
+               names_to = "Tipo",
+               values_to = "Proporcao")
+
+# 3. Definir as cores
+cor_omisso <- "#FF6347"
+cor_presente <- "#006400"
+
+# 4. Criar o gráfico com ggplot
+gg <- ggplot(plot_data, aes(x = Ano, 
+                            y = Proporcao, 
+                            fill = Tipo)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~Variavel, scales = "free_y", ncol = 2) +  # Organizar em duas colunas
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(
+    values = c("Omissos" = cor_omisso, "Presentes" = cor_presente),
+    labels = c("Valores Omissos", "Valores Presentes")
+  ) +
+  labs(
+    title = "Valores Omissos e Presentes por Variável e Ano",
+    x = "Ano",
+    y = "Proporção (%)") +
+  theme_minimal() +
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    legend.position = "bottom")
+
+# 5. Salvar o gráfico com tamanho ajustado para melhor visibilidade
+ggsave(
+  filename = "grafico_omissos_por_variavel_ano.png",
+  plot = gg,
+  path = "resultados",
+  width = 18,  # Aumentando a largura
+  height = 10, # Aumentando a altura
+  units = "in")
+
+# 6. Converter para interativo com plotly
+interactive_plot <- ggplotly(gg)
+
+# 7. Mostrar o gráfico interativo
+interactive_plot
+
+```
+  
+            
 O gráfico acima permite identificar rapidamente as variáveis com valores ausentes. As variáveis com maiores proporções de omissão indicam potenciais lacunas nos dados do SNIS, que devem ser consideradas nas interpretações dos resultados.
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
