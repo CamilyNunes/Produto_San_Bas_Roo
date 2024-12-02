@@ -1,67 +1,116 @@
-/* Ajuste do tamanho do corpo do texto */
+/* Configurações gerais para o corpo do texto */
 body {
-  font-size: 12pt; /* Tamanho do texto principal conforme ABNT */
+  font-size: 12pt; /* Texto principal conforme ABNT */
   line-height: 1.5; /* Espaçamento entre linhas conforme ABNT */
   margin: 2cm 3cm; /* Margens recomendadas pela ABNT */
+  background-color: #f9f9f9; /* Fundo suave para leitura confortável */
+  font-family: 'Poppins', sans-serif; /* Fonte moderna */
+  color: #333; /* Cor do texto */
 }
 
-/* Tamanhos consistentes para cabeçalhos */
+/* Títulos com tamanhos e espaçamentos consistentes */
 h1 {
-  font-size: 20pt; /* Tamanho adequado para o título principal */
+  font-size: 20pt; /* Título principal conforme ABNT */
   font-weight: bold;
+  text-align: center; /* Centralizado para layout profissional */
 }
 
 h2 {
-  font-size: 16pt;
+  font-size: 16pt; /* Subtítulos */
   font-weight: bold;
+  margin-top: 20px;
+  text-transform: uppercase; /* Estilo moderno */
 }
 
 h3 {
-  font-size: 14pt;
+  font-size: 14pt; /* Títulos menores */
   font-weight: bold;
+  margin-top: 15px;
 }
 
-/* Margem inferior para cada cabeçalho */
-h1, h2, h3, h4, h5, h6 {
-  margin-bottom: 12px;
+/* Ajustes para parágrafos */
+p {
+  text-align: justify; /* Justificado conforme ABNT */
+  margin-bottom: 12px; /* Espaçamento entre parágrafos */
 }
-  
-/* Imagens responsivas */
+
+/* Estilo para imagens */
 img {
   max-width: 100%;
   height: auto;
+  margin: 10px 0; /* Espaçamento acima e abaixo */
 }
 
-/* Tabelas responsivas */
+/* Tabelas com estilo moderno */
 table {
   width: 100%;
-  overflow-x: auto;
-  display: block;
-}  
-
-/* Posiciona o logotipo no canto superior esquerdo */
-.logo-container {
-  position: absolute;
-  top: 0;
-  left: 0;
+  border-collapse: collapse;
+  margin-bottom: 20px;
 }
 
-.logo-container img {
-  width: 100px; /* Ajusta o tamanho do logotipo */
+table th, table td {
+  border: 1px solid #ddd; /* Bordas finas e suaves */
+  text-align: left; /* Texto alinhado à esquerda */
+  padding: 10px; /* Espaçamento interno */
 }
 
-/* Rodape */
+table thead {
+  background-color: #f2f2f2; /* Cabeçalho com fundo claro */
+  font-weight: bold;
+}
+
+/* Rodapé personalizado */
 .custom-footer {
   text-align: center;
-  padding: 10px;
-  font-size: 14px;
-  background-color: #f2f2f2;
-  margin-top: 20px;
+  padding: 15px;
+  font-size: 12pt;
+  background-color: #4f9cf9; /* Cor moderna para destaque */
+  color: #fff;
+  margin-top: 40px;
   border-top: 1px solid #ccc;
-  color: #333;
 }
 
-.footer-image {
-  width: 100px; /* Ajuste conforme necessário */
+.custom-footer p {
+  margin: 0;
+}
+
+.custom-footer img {
+  width: 100px; /* Tamanho do logotipo no rodapé */
   margin-top: 10px;
 }
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+  body {
+    font-size: 10pt; /* Texto menor para dispositivos móveis */
+    margin: 1cm 2cm;
+  }
+
+  h1 {
+    font-size: 18pt;
+  }
+
+  h2 {
+    font-size: 14pt;
+  }
+
+  h3 {
+    font-size: 12pt;
+  }
+
+  .custom-footer {
+    font-size: 10pt;
+  }
+}
+
+/* Contêiner para gráficos */
+.plot-container {
+  max-width: 100%; /* Adapta o tamanho ao layout */
+  margin: 20px auto; /* Centraliza o gráfico horizontalmente */
+  text-align: center; /* Centraliza conteúdo interno (se necessário) */
+  padding: 15px; /* Espaçamento interno para destaque */
+  background-color: #fff; /* Fundo branco para contraste */
+  border: 1px solid #ccc; /* Bordas leves */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
