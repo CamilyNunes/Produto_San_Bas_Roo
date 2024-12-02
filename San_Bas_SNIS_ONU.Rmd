@@ -5,14 +5,18 @@ date: "`r format(Sys.Date(), '%d de %B de %Y')`"
 output: 
   html_document:
     css: "estilo.css"
+    includes:
+      after_body: "footer.html" # Inclui o rodapé após o corpo do documento
 ---
 
-```{r capa, echo=FALSE, out.width="30%", fig.align='center'}
-# Adicione o logotipo da universidade na capa
-knitr::include_graphics("https://ufr.edu.br/protic/wp-content/uploads/2022/04/PROEXA-branco.png") # Substitua com o caminho para a imagem do logotipo
-```
+<div style="display: flex; justify-content: space-between; width: 50%; padding: 10px;">
+  <!-- Primeira imagem (no canto superior esquerdo) -->
+  <img src="Imagens/logtipo_projeto2/logtipo_projeto_oficial.png" style="width: 45%; height: auto;"/>
+  <!-- Segunda imagem (no canto superior direito) -->
+  <img src="https://ufr.edu.br/protic/wp-content/uploads/2022/04/PROEXA-branco.png" style="width: 45%; height: auto;"/>
+</div>
 
-## 1. Introdução
+##  1. Introdução
 
 O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030. Diante dessa meta global, este artigo se propõe a avaliar o progresso do município de Rondonópolis, no Mato Grosso, em relação às metas específicas do ODS 6. Além do objetivo de avaliação, a motivação para o estudo reflete a curiosidade de compreender o nível de alinhamento do município com essas metas, mesmo considerando a limitação de dados disponíveis. Essa visão local é essencial, pois pode tanto orientar prefeituras e unidades prestadoras de serviços (água e esgoto) em suas políticas como servir de exemplo para a adequação de outros municípios.
 
@@ -209,9 +213,9 @@ gg <- ggplot(plot_data, aes(x = Proporcao,
                     labels = c("Valores Presentes", "Valores Omissos")) + 
   theme_minimal() + 
   theme(
-    axis.title.x = element_text(size = 14, face = "bold", color = "black"),
-    axis.title.y = element_text(size = 14, face = "bold", color = "black", angle = 90),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(size = 12, face = "bold", color = "black"),
+    axis.title.y = element_text(size = 11, face = "bold", color = "black", angle = 90),
+    plot.title = element_text(size = 11, face = "bold", hjust = 0.5),
     plot.subtitle = element_text(size = 12, hjust = 0.5),
     panel.grid.major = element_line(color = "grey85"),
     panel.grid.minor = element_blank())  
@@ -279,9 +283,9 @@ gg <- ggplot(plot_data, aes(x = Ano,
     y = "Proporção (%)") +
   theme_minimal() +
   theme(
-    axis.title.x = element_text(size = 14, face = "bold"),
-    axis.title.y = element_text(size = 14, face = "bold"),
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 11, face = "bold"),
+    plot.title = element_text(size = 11, face = "bold", hjust = 0.5),
     legend.position = "bottom")
 
 # 5. Salvar o gráfico com tamanho ajustado para melhor visibilidade
@@ -322,7 +326,7 @@ legendavar <- 'Consumo Percapita de Água (l/hab/dia)'
 chave <- 'media'
 ```
 
-### 4. Funções de Suporte para Gráficos
+4. Funções de Suporte para Gráficos
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Função para limpar strings, removendo espaços, caracteres especiais e acentos
@@ -344,7 +348,7 @@ cleanStr <- function(string) {
 }
 ```
 
-## 5. Definir Tema Personalizado para Gráficos (ggplot2)
+5. Definir Tema Personalizado para Gráficos (ggplot2)
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 tema_plot <- function(dataTime, legendavar, chave) {
@@ -429,7 +433,7 @@ dev01 <- function(data, datavar, chave, legendavar) {
 }
 ```
 
-# Água Potável e Saneamento
+#  Água Potável e Saneamento
 
 Garantir disponibilidade e manejo sustentável da água e saneamento para todos
 
@@ -444,7 +448,7 @@ dev01(san_roo, san_roo$Pop_total_atendida_abas_agua, 'media','Pop. total com Aba
 dev01(san_roo, san_roo$Consumo_agua_percapita, 'media','Consumo Percapita de Água (l-hab-dia)')
 ```
 
-# Meta 6.1.1: Proporção da População com Água Potável
+### Meta 6.1.1: Proporção da População com Água Potável
 
 Na seção, estamos realizando uma análise para calcular a proporção da população de Rondonópolis que tem acesso a água potável gerida de forma segura, utilizando dados do município e da população. O objetivo é verificar o percentual da população atendida por serviços de água potável que são gerenciados de maneira segura ao longo dos anos.
 
@@ -458,7 +462,7 @@ O Indicador 6.1.1 mensura a proporção da população que utiliza serviços de 
 
 A seguir, detalhamos as etapas envolvidas nesse processo.
 
-## 1. Filtragem e Preparação dos Dados
+### 1. Filtragem e Preparação dos Dados
 
 O primeiro passo é filtrar os dados para o intervalo de anos de interesse (2001 a 2021) e selecionar as colunas relevantes, como o ano e a quantidade de população atendida por serviços de água potável. A coluna de população atendida pode conter caracteres especiais, como vírgulas ou pontos, que são removidos para garantir que a variável seja numérica. Este é o código utilizado:
 
@@ -477,7 +481,7 @@ san_meta <- san_roo %>%
     Pop_rural_atendida_abas_agua = as.numeric(gsub("[.,]", "", Pop_rural_atendida_abas_agua))) 
 ```
 
-## 2. Coleta de Dados de População
+### 2. Coleta de Dados de População
 
 Para calcular a proporção, também precisamos dos dados de população total de Rondonópolis, que são extraídos da API SIDRA do IBGE. O código utiliza o código da tabela 6579, que fornece estimativas anuais de população:
 
@@ -490,7 +494,7 @@ resposta <- GET(url)
 populacao_rondonopolis <- fromJSON(content(resposta, "text"))
 ```
 
-## 3. Preparação dos Dados de População
+### 3. Preparação dos Dados de População
 
 A resposta da API do SIDRA contém várias colunas, mas estamos interessados apenas nas colunas de ano e população total. As colunas são extraídas e convertidas para o formato numérico:
 
@@ -502,7 +506,7 @@ pop_total <- populacao_rondonopolis %>%
          Populacao = as.numeric(Populacao))
 ```
 
-## 4. Unindo os Dados e Calculando a Proporção
+### 4. Unindo os Dados e Calculando a Proporção
 
 Com os dados de população de Rondonópolis e os dados de atendimento por água potável já preparados, unimos as duas fontes de informação com base no ano. Em seguida, calculamos a proporção da população atendida por serviços de água potável, dividindo o número de pessoas atendidas pela população total de cada ano e multiplicando por 100 para obter o percentual:
 
@@ -565,7 +569,7 @@ ggsave(
 )
 ```
 
-## 5. Resultado Esperado
+### 5. Resultado Esperado
 
 O resultado final dessa análise será uma nova coluna chamada perc_pop_atendida, que representa a porcentagem da população atendida por água potável gerida de forma segura para cada ano entre 2001 e 2021. Com isso, conseguimos observar como essa proporção variou ao longo do tempo e avaliar o progresso da cidade em relação à meta 6.1 da ODS 6, que busca garantir acesso universal e equitativo à água potável até 2030.
 
@@ -660,7 +664,7 @@ ggsave(
 
 ```
 
-##6.2(b)
+## 6.2(b)
 
 Indicador 6.2(b): Proporção da População com Acesso a Instalações de Lavagem de Mãos
 
@@ -689,3 +693,4 @@ dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media', 'Volume Esgoto Tratado (m
 dev01(san_roo, san_roo$Indice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
 dev01(san_roo, san_roo$Indice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
 ```
+
