@@ -6,12 +6,12 @@ output:
   html_document:
     css: "estilo.css"
     includes:
-      after_body: "footer.html" # Inclui o rodapé após o corpo do documento
+      after_body: "footer.html"
 ---
 
 <div style="display: flex; justify-content: space-between; width: 50%; padding: 10px;">
   <!-- Primeira imagem (no canto superior esquerdo) -->
-  <img src="Imagens/logtipo_projeto2/logtipo_projeto_oficial.png" style="width: 45%; height: auto;"/>
+  <img src="Image/logtipo_projeto2/logtipo_projeto_oficial.png" style="width: 45%; height: auto;"/>
   <!-- Segunda imagem (no canto superior direito) -->
   <img src="https://ufr.edu.br/protic/wp-content/uploads/2022/04/PROEXA-branco.png" style="width: 45%; height: auto;"/>
 </div>
@@ -693,4 +693,7 @@ dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media', 'Volume Esgoto Tratado (m
 dev01(san_roo, san_roo$Indice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
 dev01(san_roo, san_roo$Indice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
 ```
+
+
+
 
