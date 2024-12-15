@@ -9,14 +9,13 @@ output:
       after_body: "footer.html"
 ---
 
-<div style="display: flex; justify-content: space-between; width: 50%; padding: 10px;">
-  <!-- Primeira imagem (no canto superior esquerdo) -->
-  <img src="Image/logtipo_projeto2/logtipo_projeto_oficial.png" style="width: 45%; height: auto;"/>
-  <!-- Segunda imagem (no canto superior direito) -->
-  <img src="https://ufr.edu.br/protic/wp-content/uploads/2022/04/PROEXA-branco.png" style="width: 45%; height: auto;"/>
-</div>
+::: {style="display: flex; justify-content: space-between; width: 50%; padding: 10px;"}
+<!-- Primeira imagem (no canto superior esquerdo) -->
 
-##  1. Introdução
+<img src="Image/logtipo_projeto2/logtipo_projeto_oficial.png" style="width: 45%; height: auto;"/> <!-- Segunda imagem (no canto superior direito) --> <img src="https://ufr.edu.br/protic/wp-content/uploads/2022/04/PROEXA-branco.png" style="width: 45%; height: auto;"/>
+:::
+
+## 1. Introdução
 
 O Objetivo de Desenvolvimento Sustentável 6 (ODS 6), definido pela Organização das Nações Unidas, busca assegurar a disponibilidade e a gestão sustentável da água potável e do saneamento para todos até 2030. Diante dessa meta global, este artigo se propõe a avaliar o progresso do município de Rondonópolis, no Mato Grosso, em relação às metas específicas do ODS 6. Além do objetivo de avaliação, a motivação para o estudo reflete a curiosidade de compreender o nível de alinhamento do município com essas metas, mesmo considerando a limitação de dados disponíveis. Essa visão local é essencial, pois pode tanto orientar prefeituras e unidades prestadoras de serviços (água e esgoto) em suas políticas como servir de exemplo para a adequação de outros municípios.
 
@@ -30,15 +29,80 @@ O estudo visa verificar se o município de Rondonópolis está caminhando na dir
 
 6.1: Acesso universal e equitativo à água potável segura;\
 6.2: Acesso a saneamento e higiene adequados e equitativos, eliminando a defecação a céu aberto;\
-6.3: Melhoria da qualidade da água e aumento da reciclagem e reutilização; 6.4: Eficiência no uso da água e redução da escassez de água; 6.5: Implementação da gestão integrada dos recursos hídricos; 6.6: Proteção e restauração de ecossistemas aquáticos; 6.7: Ampliação da cooperação internacional para apoio técnico e capacitação; 6.8: Fortalecimento da participação comunitária na gestão da água e saneamento.
+6.3: Melhoria da qualidade da água e aumento da reciclagem e reutilização;  
+6.4: Eficiência no uso da água e redução da escassez de água; \
+6.5: Implementação da gestão integrada dos recursos hídricos; \
+6.6: Proteção e restauração de ecossistemas aquáticos; \
+6.7: Ampliação da cooperação internacional para apoio técnico e capacitação;    
+6.8: Fortalecimento da participação comunitária na gestão da água e saneamento.\
 
 ## 3. Metodologia
 
-O processo metodológico inclui a instalação e carregamento de pacotes, carregamento dos dados e tratamento dos dados do SNIS para selecionar as variáveis de interesse.
+O processo metodológico envolve a instalação e carregamento de pacotes, além do processamento e tratamento dos dados disponibilizados pelo Sistema Nacional de Informações sobre Saneamento (SNIS). No entanto, em 2023, o SNIS encerrou suas atividades relacionadas à coleta de informações sobre a prestação de serviços de todos os componentes do saneamento básico. A partir de 2024, o Sistema Nacional de Informações em Saneamento Básico (SINISA) assumiu as atividades, dando continuidade ao legado do SNIS e aprimorando a gestão das informações do setor.
 
-### 3.1 Instalar e Carregar Pacotes
+### 3.1 **Pacotes Utilizados**
 
-Para realizar a análise, utilizamos uma série de pacotes no R, essenciais para manipulação, visualização e análise de dados geoespaciais e de séries temporais. Os pacotes usados incluem ggplot2 para visualizações, dplyr para manipulação de dados, plotly para gráficos interativos, entre outros.
+A análise faz uso de pacotes da linguagem R que permitem manipulação, visualização e análise de dados espaciais e tabulares. Os pacotes principais incluem:
+
+-   tidyverse: Um conjunto de pacotes (como dplyr e ggplot2) para manipulação e visualização de dados.
+
+-   plotly: Para criação de visualizações interativas.
+
+-   sf: Manipulação e visualização de dados espaciais.
+
+-   readr: Para leitura eficiente de dados tabulares.
+
+-   httr: Validação de conexões HTTP ao acessar repositórios online de dados.
+
+### 3.2 Descrição Geral da Análise
+
+A análise está estruturada em três etapas principais:
+
+#### a) **Coleta de Dados**
+
+Os dados foram obtidos do Sistema Nacional de Informações sobre Saneamento (SNIS) e carregados diretamente de repositórios online. Para garantir a confiabilidade das fontes, a URL foi verificada usando o pacote `httr`.
+
+#### b) **Tratamento e Limpeza de Dados**
+
+Os dados foram tratados para atender aos objetivos específicos da análise:
+
+-   Seleção de variáveis relevantes, como população atendida, índices de coleta e tratamento de esgoto, e volume de resíduos sólidos coletados.
+
+-   Conversão de formatos e preenchimento de valores ausentes para garantir a consistência.
+
+-   Foco no município de **Rondonópolis**, com filtragem de dados baseada no nome do município.
+
+#### c) **Análise Descritiva e Alinhamento às Metas do ODS 6**
+
+A análise descritiva será realizada para medir indicadores específicos relacionados ao ODS 6, como:
+
+-   **Meta 6.1**: Proporção da população com acesso a água potável.
+
+-   **Meta 6.2**: Proporção da população com serviços de saneamento seguro.
+
+### 3.3 **Ferramentas de Visualização**
+
+Para tornar os resultados mais acessíveis e compreensíveis, serão utilizadas:
+
+-   **Gráficos Estáticos**: Criados com `ggplot2` para representar indicadores principais.
+
+-   **Gráficos Interativos**: Utilizando `plotly` para permitir a exploração detalhada dos dados.
+
+-   **Mapas Temáticos**: Criados com `sf` para ilustrar a distribuição espacial de serviços e infraestrutura.
+
+### 3.4 **Validação e Interpretação dos Resultados**
+
+Os resultados serão avaliados para:
+
+-   Identificar discrepâncias ou áreas críticas em Rondonópolis.
+
+-   Comparar os indicadores locais às metas globais do ODS 6.
+
+-   Propor estratégias para melhoria nos serviços de saneamento básico.
+
+### 3.5 Instalar e Carregar Pacotes
+
+Para realizar a análise, utilizamos uma série de pacotes no R, essenciais para manipulação, visualização e análise de dados geoespaciais e de séries temporais.
 
 -   **Instalar Pacotes (se necessário):**
 
@@ -57,57 +121,86 @@ if(length(pacotes_nao_instalados)) install.packages(pacotes_nao_instalados)
 
 Após garantir que todos os pacotes estão instalados, eles são carregados no ambiente R.
 
-```{r, warning=FALSE,echo=FALSE,message=FALSE}
-invisible(lapply(pacotes, function(pkg) {
-  if (!require(pkg, character.only = TRUE)) {
-    stop(paste("Falha ao carregar o pacote:", pkg))
+```{r, warning=FALSE,echo=FALSE,message=FALSE, results='hide'}
+lapply(pacotes, function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
   }
-}))
+  suppressMessages(library(pkg, character.only = TRUE))
+})
 ```
 
 Esses pacotes garantem uma base sólida para o carregamento, manipulação e visualização dos dados que serão utilizados na análise.
 
-### 3. 2 Carregar os Dados
+### 3.6 Carregar os Dados
 
 Os dados utilizados neste estudo foram extraídos do Sistema Nacional de Informações sobre Saneamento (SNIS) e estão hospedados em um repositório do GitHub. Para assegurar a reprodutibilidade, o código carrega diretamente o arquivo CSV a partir da URL fornecida.
 
--   **Fonte dos Dados**: Repositório GitHub da pesquisadora.
+-   **Fonte dos Dados**: Repositório GitHub da pesquisadora (Colocar o link aqui).
 -   **Formato do Arquivo**: Arquivo CSV com separador `;` e codificação `ISO-8859-1`, que permite a leitura correta de caracteres em português.
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 url <- "https://github.com/CamilyNunes/Produto_San_Bas_Roo/raw/refs/heads/main/Dados/SNIS%20-%20S%C3%A9rie%20Hist%C3%B3rica/Agregado-20240925161723-SNISMT.csv"  
 
-san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
+if (!httr::http_error(url)) {
+  san_mt <- read_delim(url, delim = ";", locale = locale(encoding = "ISO-8859-1"))
+} else {
+  stop("Erro ao acessar a URL fornecida. Verifique o link.")
+}
 ```
 
-### 3. 3 Tratamento dos Dados
+### 3.7 Tratamento dos Dados
 
-Após o carregamento, realizamos o tratamento dos dados para selecionar as colunas de interesse e garantir que os indicadores relevantes para o estudo estejam bem organizados. Esse processo inclui a seleção das variáveis de saneamento e o filtro para a cidade de Rondonópolis.
+Após o carregamento, realizamos o tratamento dos dados para selecionar as variáveis de interesse e garantir que os indicadores relevantes para o estudo estejam bem organizados. Esse processo inclui a seleção das variáveis de saneamento e o filtro para a cidade de Rondonópolis.
 
--   **Desabilitar Notação Científica:** Para garantir que os números não sejam representados em notação científica:
+-   **Desabilitar Notação Científica:** Para garantir que os números não sejam representados em notação científica.
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 options(scipen = 999) 
 ```
 
--   **Seleção de Colunas de Interesse**: Escolhemos apenas as colunas que contêm indicadores fundamentais para a análise de saneamento em Rondonópolis, como população atendida com água, consumo per capita de água e índices de coleta e tratamento de esgoto.
+-   **Seleção de variaveis de Interesse**: Glossário de informações
 
-Selecionar colunas de interesse:
+O SNIS atualmente está dividido em três componentes: água e esgotos (SNIS-AE), resíduos sólidos (SNIS-RS) e Águas Pluviais (SNIS-AP), mas as variáveis que precisamos está no componete água e esgotos (SNIS-AE). A seguir segue as informações das variáveis utilizadas.
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # selecionar variaveis de referencia
 san <- san_mt[,c(1:10)]
 ```
 
+Geral
+
 1.  Água:
 
+AG001 - POPULAÇÃO TOTAL ATENDIDA COM ABASTECIMENTO DE ÁGUA
+
+Valor da população total atendida com abastecimento de água pelo prestador de serviços, no último dia do ano de referência. Corresponde à população urbana que é efetivamente atendida com os serviços acrescida de outras populações atendidas localizadas em áreas não consideradas urbanas. Essas populações podem ser rurais ou mesmo com características urbanas, apesar de estarem localizadas em áreas consideradas rurais pelo IBGE. Caso o prestador de serviços não disponha de procedimentos próprios para definir, de maneira precisa, essa população, o mesmo poderá estimá-la utilizando o produto da quantidade de economias residenciais ativas de água (AG013), multiplicada pela taxa média de habitantes por domicílio do respectivo município, obtida no último Censo ou Contagem de População do IBGE. Quando isso ocorrer, o prestador de serviços deverá abater da quantidade de economias residenciais ativas de água, o quantitativo correspondente aos domicílios atendidos e que não contam com população residente. Como, por exemplo, em domicílios utilizados para veraneio, em domicílios utilizados somente em finais de semanas, imóveis desocupados, dentre outros. Assim, o quantitativo de economias residenciais ativas a ser considerado na estimativa populacional normalmente será inferior ao valor informado em AG013. A população AG001 deve ser menor ou igual à população da informação G12a.
+Referências: AG025; AG026; X030; X040; X050; X095; X115; X125; X185. Unidade: Habitantes.
+
+AG026 - POPULAÇÃO URBANA ATENDIDA COM ABASTECIMENTO DE ÁGUA
+
+Valor da população urbana atendida com abastecimento de água pelo prestador de serviços, no último dia do ano de referência. Corresponde à população urbana que é efetivamente atendida com os serviços. Caso o prestador de serviços não disponha de procedimentos próprios para definir, de maneira precisa, essa população, o mesmo poderá estimá-la utilizando o produto da quantidade de economias residenciais ativas de água (AG013), na zona urbana, multiplicada pela taxa média de habitantes por domicílio do respectivo município, obtida no último Censo ou Contagem de População do IBGE. Quando isso ocorrer, o prestador de serviços deverá abater da quantidade de economias residenciais ativas de água, existentes na zona urbana, o quantitativo correspondente aos domicílios atendidos e que não contam com população residente. Como, por exemplo, domicílios utilizados para veraneio, domicílios utilizados somente em finais de semana, imóveis desocupados, dentre outros. Assim o quantitativo de economias residenciais ativas a ser considerado na estimativa populacional normalmente será inferior ao valor informado em AG013, considerando a área urbana. AG026 não deve ser confundida com a população urbana residente nos municípios com abastecimento de água, identificada pelo código G06a. A população AG026 deve ser menor ou igual à população da informação G06a.
+Referências: AG001; AG013; AG025; X035; X040; X050; X115; X185. Unidade: Habitantes.
+
+AG007 - VOLUME DE ÁGUA TRATADA EM ETAS
+
+Volume anual de água submetido a tratamento, incluindo a água bruta captada pelo prestador de serviços e a água bruta importada (AG016), medido ou estimado na(s) saída(s) da(s) ETA(s)\*. Deve estar computado no volume de água produzido (AG006). Não inclui o volume de água tratada por simples desinfecção em UTS(s) (AG015) e nem o volume importado de água já tratada (AG018).
+Referências: AG006; AG015; AG016; AG018; X065; X115; X160. Unidade: 1.000 m³/ano.   
+*Estação de tratamento de água (ETA) é o local onde a água captada de uma fonte superficial ou subterrânea é tratada e purificada para se tornar potável, ou seja, própria para o consumo humano, ou para se tornar adequada para uso industrial.
+
+AG015 - VOLUME DE ÁGUA TRATADA POR SIMPLES DESINFECÇÃO  
+
+Volume anual de água captada de manancial subterrâneo ou fonte de cabeceira, ou de água bruta importada, que apresenta naturalmente características físicas, químicas e organolépticas que a qualificam como água potável e, por isto, é submetida apenas a simples desinfecção, medido ou estimado na(s) saída(s) da(s) UTS(s). Deve estar computado no volume de água produzido (AG006). Não inclui o volume de água tratada em ETA(s) (AG007) e nem o volume de água tratada importada (AG018).
+Referências: AG006; AG007; AG016; AG018; X065; X160. Unidade: 1.000 m³/ano.
+
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
-#6.1(a)
-san$Pop_total_atendida_abas_agua <- as.numeric(as.character(san_mt$`AG001 - População total atendida com abastecimento de água`))
-san$Pop_urbana_atendida_abas_agua <- as.numeric(as.character(san_mt$`AG026 - População urbana atendida com abastecimento de água`))
-san$Pop_rural_atendida_abas_agua <- san_mt$`AG025A - População rural atendida com abastecimento de água no ano anterior ao de referência.`
-san$Consumo_agua_percapita <- san_mt$`IN022 - Consumo médio percapita de água` 
-san$Atendimento_total_percentual <- san_mt$`IN055 - Índice de atendimento total de água`
+#Meta 6.1(a)
+#Geral
+san$Pop_total_atendida_abas_agua <- san_mt$`AG001 - População total atendida com abastecimento de água`
+san$Pop_urbana_atendida_abas_agua <- san_mt$`AG026 - População urbana atendida com abastecimento de água`
+san$Pop_rural_atendida_abas_agua <- san_mt$`AG025A - População rural atendida com abastecimento de água no ano anterior ao de referência.`  
+san$Volume_agua_tratada_ETAs <- san_mt$`AG007 - Volume de água tratada em ETAs`
+san$Volume_agua_tratada_simples_desinfecção <- san_mt$`AG015 - Volume de água tratada por simples desinfecção`
 ```
 
 2.  Esgoto e Coleta de lixo:
@@ -160,13 +253,17 @@ Esse tratamento garante que os dados estejam prontos para análise, permitindo e
 
 Nesta seção, exploramos os dados de saneamento básico e consumo de água para o município de Rondonópolis, com o objetivo de avaliar seu progresso em relação às metas do ODS 6. A análise inclui a visualização da qualidade e completude dos dados, o cálculo de indicadores fundamentais e a criação de gráficos interativos que facilitam a interpretação e exploração dos dados ao longo do tempo.
 
+### 4.1 Visualização dos Resultados Tratados
+
+Antes de prosseguir com análises, é fundamental verificar a consistência dos dados.
+
 ### 4.1 Análise de Valores Ausentes
 
-Para garantir a consistência e confiabilidade da análise, é importante identificar e visualizar a proporção de valores ausentes em cada variável do conjunto de dados. Isso permite uma melhor compreensão de possíveis lacunas de dados que possam afetar os resultados.
+Para garantir a consistência e a confiabilidade da análise, é essencial identificar e visualizar a proporção de valores ausentes em cada variável do conjunto de dados. Isso permite compreender melhor as lacunas de dados que podem impactar os resultados.
 
 -   **Gráfico de Proporção de Valores Ausentes**:
 
-Abaixo, geramos um gráfico de barra empilhada que mostra a proporção de valores presentes e ausentes para cada atributo relevante. Esse gráfico indica quais variáveis precisam de atenção adicional em termos de completude de dados.
+A seguir, apresentamos um gráfico de barras empilhadas que mostra a proporção de valores presentes e ausentes para cada variável. Esse gráfico ajuda a identificar quais variáveis necessitam de atenção adicional. Vale destacar que as informações do SNIS são coletadas anualmente de prestadores de serviços ou órgãos municipais responsáveis pela gestão dos serviços. A base de dados é totalmente pública e disponibilizada gratuitamente no site www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/snis. No entanto, pode ocorrer que os prestadores de serviços não possuam ou não tenham informado os dados relativos a determinadas variáveis ou anos, o que pode resultar em valores ausentes.
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # 1. Criar uma função que calcula a proporção de valores omissos (NA) por coluna
@@ -176,7 +273,7 @@ calc_missing_proportion <- function(df) {
     })
   
   missing_df <- data.frame(
-    Atributo = names(missing_data),
+    Peso = names(missing_data),
     Omissos = missing_data)
   
   missing_df <- missing_df %>%
@@ -201,7 +298,7 @@ cor_presente <- "#006400"
 
 # 5. Criar o gráfico de coluna empilhada em 100% e inverter os eixos
 gg <- ggplot(plot_data, aes(x = Proporcao, 
-                             y = Atributo, 
+                             y = Peso, 
                              fill = Valores )) +
   geom_bar(stat = "identity", position = "fill") +
   scale_x_continuous(labels = scales::percent) +
@@ -308,11 +405,7 @@ interactive_plot
 O gráfico acima permite identificar rapidamente as variáveis com valores ausentes. As variáveis com maiores proporções de omissão indicam potenciais lacunas nos dados do SNIS, que devem ser consideradas nas interpretações dos resultados.
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
-# 1. Extração da Variável de Interesse
-# A variável 'datavar' contém o consumo per capita de água em litros por habitante por dia.
-datavar <- san_roo$Consumo_agua_percapita
-
-# 2. Armazenamento do Dataset Completo
+# 1. Armazenamento do Dataset Completo
 # A variável 'data' recebe o dataset 'san' completo.
 # Isso permite o uso de todos os dados na análise subsequente.
 data <- san_roo
@@ -320,13 +413,14 @@ data <- san_roo
 # 3. Definição da Legenda para Gráficos
 # Define a legenda para as visualizações que utilizam a variável 'datavar'.
 # A legenda indica que a variável representa o "Consumo Percapita de Água" em litros por habitante por dia.
-legendavar <- 'Consumo Percapita de Água (l/hab/dia)'
+legendavar <- ' '
 
 # Definição de chave para a média
+#A variável chave é atribuída ao valor 'media', indicando que será utilizada para calcular a média em análises futuras.
 chave <- 'media'
 ```
 
-4. Funções de Suporte para Gráficos
+4.  Funções de Suporte para Gráficos
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Função para limpar strings, removendo espaços, caracteres especiais e acentos
@@ -348,15 +442,15 @@ cleanStr <- function(string) {
 }
 ```
 
-5. Definir Tema Personalizado para Gráficos (ggplot2)
+5.  Definir Tema Personalizado para Gráficos (ggplot2)
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 tema_plot <- function(dataTime, legendavar, chave) {
   
   # Criar gráfico básico de linha com o tema minimalista
   plot <- ggplot(data = dataTime, aes(x = tempo, y = x, group = 1)) +
-            geom_line(color = "#006400", size = 1.2) +  # Linha na cor verde-escura
-            geom_label(aes(label = label), size = 3, color = "#006400", nudge_y = 0.5) +  # Rótulos em verde-escuro
+            geom_line(color = "#3586ff", size = 1.2) +  # Linha na cor verde-escura
+            geom_label(aes(label = label), size = 3, color = "#3586ff", nudge_y = 0.5) +  # Rótulos em verde-escuro
             labs(
               title = "Evolução Temporal de Rondonópolis (MT)",
               subtitle = legendavar,
@@ -433,38 +527,37 @@ dev01 <- function(data, datavar, chave, legendavar) {
 }
 ```
 
-#  Água Potável e Saneamento
+# Verificação dos Indicadores do ODS 6
 
-Garantir disponibilidade e manejo sustentável da água e saneamento para todos
+A análise do desempenho de Rondonópolis em relação à Meta 6 do ODS 6 é limitada pela ausência de dados completos. Contudo, para obter uma visão geral, utilizamos dados do Sistema Nacional de Informações sobre Saneamento (SNIS) e da Tabela 6579 da SIDRA do IBGE, que fornece estimativas da população residente.
 
-## Meta 6.1
+## Água Potável e Saneamento
+
+Garantir disponibilidade e manejo sustentável da água e saneamento para todos.
+
+### Meta 6.1: Acesso Universal e Equitativo à Água Potável e Segura
 
 Até 2030, alcançar o acesso universal e equitativo a água potável e segura para todos.
 
-Em relação ao múnicipio de Rondonópolis é possível acompanhar a seríe hístorica de abastecimento de água durante o periodo de 2000 a 2022, como é apresentado no gráfico a seguir, apresentando um aumento de habitantes de rondonópolis com abastecimento de água, saindo de 145.600 habitantes em 2000 a 244.911 em 2022.
+Para município de Rondonópolis é possível analisar a série histórica de abastecimento de água entre 1999 a 2022, conforme ilustrado no gráfico a seguir. Os dados mostram um aumento de habitantes atendidos ao longo dos anos e durante um período de 10 anos a população obeteve acesso a abastecimento de água crescente de 190.750 habitantes em 2010 para 244.911 habitantes em 2022, indicando uma evolução positiva no alcance dos serviços de água.
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
-dev01(san_roo, san_roo$Pop_total_atendida_abas_agua, 'media','Pop. total com Abastecimento de Água')
-dev01(san_roo, san_roo$Consumo_agua_percapita, 'media','Consumo Percapita de Água (l-hab-dia)')
+dev01(san_roo, san_roo$Pop_total_atendida_abas_agua, 'media','Pop. total com Abastecimento de Água (Habitantes)')
 ```
 
 ### Meta 6.1.1: Proporção da População com Água Potável
 
-Na seção, estamos realizando uma análise para calcular a proporção da população de Rondonópolis que tem acesso a água potável gerida de forma segura, utilizando dados do município e da população. O objetivo é verificar o percentual da população atendida por serviços de água potável que são gerenciados de maneira segura ao longo dos anos.
+Esta seção realiza a análise da proporção da população tanto rural quanto urbanha de Rondonópolis com acesso a água potável gerida de forma segura. O indicador 6.1.1 mede a porcentagem da população atendida por serviços de água potável, considerando as seguintes condições de segurança:
 
-O Indicador 6.1.1 mensura a proporção da população que utiliza serviços de água potável gerenciados de forma segura. A definição de "seguro" para o abastecimento de água envolve:
+-   Fonte aprimorada de água: inclui redes gerais de distribuição, poços artesianos e poços rasos protegidos.
 
--   Fonte aprimorada de água: Isso inclui redes gerais de distribuição de água, poços artesianos, poços rasos protegidos, nascentes protegidas e até mesmo água de chuva armazenada.
+-   Localização da água: deve estar disponível no domicílio ou na propriedade do residente. 
 
--   Localização da água: A água deve estar disponível no domicílio ou na propriedade do residente.
+-   Disponibilidade e segurança: a água deve estar disponível conforme a necessidade e livre de contaminação fecal ou química.
 
--   Disponibilidade e segurança: A água deve ser disponível conforme a necessidade da população e livre de contaminação fecal ou química.
+#### 1. Filtragem e Preparação dos Dados
 
-A seguir, detalhamos as etapas envolvidas nesse processo.
-
-### 1. Filtragem e Preparação dos Dados
-
-O primeiro passo é filtrar os dados para o intervalo de anos de interesse (2001 a 2021) e selecionar as colunas relevantes, como o ano e a quantidade de população atendida por serviços de água potável. A coluna de população atendida pode conter caracteres especiais, como vírgulas ou pontos, que são removidos para garantir que a variável seja numérica. Este é o código utilizado:
+O primeiro passo é filtrar os dados para o intervalo de anos de interesse (2001 a 2021), pois assim é possível usar os dados fornecidos pela SIDRA e selecionar as colunas relevantes, como o ano e a quantidade de população atendida por serviços de água potável. A coluna de população atendida pode conter caracteres especiais, como vírgulas ou pontos, que são removidos para garantir que a variável seja numérica. Este é o código utilizado:
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
@@ -483,7 +576,7 @@ san_meta <- san_roo %>%
 
 ### 2. Coleta de Dados de População
 
-Para calcular a proporção, também precisamos dos dados de população total de Rondonópolis, que são extraídos da API SIDRA do IBGE. O código utiliza o código da tabela 6579, que fornece estimativas anuais de população:
+Para calcular a proporção, é necessário utilizar os dados da população total de Rondonópolis, que podem ser extraídos da API SIDRA do IBGE. Para isso, usamos a tabela 6579 do Sistema IBGE de Recuperação Automática (SIDRA), que apresenta estimativas anuais da população residente. O acesso à tabela pode ser feito através do link: [https://www.ibge.gov.br/busca.html?searchword=6579].
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # URL da API do SIDRA para população de Rondonópolis
@@ -491,7 +584,7 @@ url <- "https://apisidra.ibge.gov.br/values/t/6579/p/all/n6/5107602"
 
 # Requisitar dados da API
 resposta <- GET(url)
-populacao_rondonopolis <- fromJSON(content(resposta, "text"))
+populacao_roo <- fromJSON(content(resposta, "text"))
 ```
 
 ### 3. Preparação dos Dados de População
@@ -500,7 +593,7 @@ A resposta da API do SIDRA contém várias colunas, mas estamos interessados ape
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Selecionar colunas relevantes, incluindo o código do município
-pop_total <- populacao_rondonopolis %>%
+pop_total <- populacao_roo %>%
   select(Ano = D1N, Populacao = V) %>%
   mutate(Ano = as.numeric(Ano), 
          Populacao = as.numeric(Populacao))
@@ -527,16 +620,20 @@ meta61 <- san_bas %>%
 # gráfico de barras
 grafico_barras <- meta61 %>%
   ggplot(aes(x = Ano)) +
+  
   # População total atendida
   geom_bar(aes(y =  Pop_total_atendida_pct, fill = "Total", text = paste0(round(Pop_total_atendida_pct, 2), "%")), 
            stat = "identity", position = "dodge", width = 0.8) +
+  
   # População urbana atendida
   geom_bar(aes(y =  Pop_urbana_atendida_pct, fill = "Urbana", text = paste0(round(Pop_urbana_atendida_pct, 2), "%")), 
            stat = "identity", position = "dodge", width = 0.8) +
+  
   # População rural atendida
   geom_bar(aes(y = Pop_rural_atendida_pct, fill = "Rural", text = paste0(round(Pop_rural_atendida_pct, 2), "%")), 
            stat = "identity", position = "dodge", width = 0.8) +
-  scale_fill_manual(values = c("Total" = "#FF9999", "Urbana" = "#66B3FF", "Rural" = "#99FF99")) +  # Definindo cores diferentes
+  scale_fill_manual(values = c("Total" = "#FF9999", "Urbana" = "#66B3FF", "Rural" = "#99FF99")) + # Definindo cores diferentes
+  
   labs(
     title = "População Atendida por Abastecimento de Água",
     x = "Ano",
@@ -565,15 +662,10 @@ ggsave(
   width = 10, 
   height = 6, 
   units = "in", 
-  dpi = 300
-)
+  dpi = 300)
 ```
 
-### 5. Resultado Esperado
-
-O resultado final dessa análise será uma nova coluna chamada perc_pop_atendida, que representa a porcentagem da população atendida por água potável gerida de forma segura para cada ano entre 2001 e 2021. Com isso, conseguimos observar como essa proporção variou ao longo do tempo e avaliar o progresso da cidade em relação à meta 6.1 da ODS 6, que busca garantir acesso universal e equitativo à água potável até 2030.
-
-Essa análise é importante porque nos permite verificar não apenas o número de pessoas atendidas, mas também a evolução dessa cobertura ao longo dos anos, fornecendo uma visão crítica sobre os avanços ou lacunas na implementação de políticas públicas de saneamento.
+Inicialemnte, é possivel verificar que em 2021 de 100% da população total 96,19% da população urbana foi atendida com abastecimento de água. A 
 
 # Meta 6.2 - Acesso a Saneamento e Higiene Adequados até 2030
 
@@ -693,7 +785,3 @@ dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media', 'Volume Esgoto Tratado (m
 dev01(san_roo, san_roo$Indice_coleta_esgoto, 'agregar','Índice de Coleta de Esgoto')
 dev01(san_roo, san_roo$Indice_tratamento_esgoto_percentual, 'agregar','Índice Tratamento de Esgoto')
 ```
-
-
-
-
