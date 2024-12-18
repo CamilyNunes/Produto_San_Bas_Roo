@@ -5,8 +5,10 @@ date: "`r format(Sys.Date(), '%d de %B de %Y')`"
 output: 
   html_document:
     css: "estilo.css"
-    includes:
-      after_body: "footer.html"
+    code_folding: hide
+  pdf_document: default
+params:
+  exemplo_param: "Exemplo"
 ---
 
 ::: {style="display: flex; justify-content: space-between; width: 50%; padding: 10px;"}
