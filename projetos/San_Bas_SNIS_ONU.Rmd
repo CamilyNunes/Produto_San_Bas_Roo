@@ -7,7 +7,6 @@ output:
   pdf_document: default
   html_document:
     css: estilo.css
-always_allow_html: true
 ---
 
 ::: {style="display: flex; justify-content: space-between; width: 50%; padding: 10px;"}
@@ -338,7 +337,7 @@ interactive_plot <- ggplotly(gg)
 interactive_plot
 ```
 
-```{r, fig.width=12, fig.height=14, warning=FALSE,echo=FALSE,message=FALSE}
+```{r,fig.align='center', fig.width=9, fig.height=14, warning=FALSE,echo=FALSE,message=FALSE}
 # 1. Calcular a proporção de valores omissos por variável e ano
 calc_missing_by_year <- function(df) {
   # Selecionar apenas colunas numéricas e a coluna "Ano"
@@ -395,8 +394,8 @@ ggsave(
   filename = "grafico_omissos_por_variavel_ano.png",
   plot = gg,
   path = "graficos",
-  width = 12,  # largura
-  height = 14, # altura
+  width = 8,  # largura
+  height = 7, # altura
   units = "in")
 
 # 6. Converter para interativo com plotly
@@ -417,7 +416,6 @@ data <- san_roo
 
 # 3. Definição da Legenda para Gráficos
 # Define a legenda para as visualizações que utilizam a variável 'datavar'.
-# A legenda indica que a variável representa o "Consumo Percapita de Água" em litros por habitante por dia.
 legendavar <- ' '
 
 # Definição de chave para a média
@@ -449,13 +447,13 @@ cleanStr <- function(string) {
 
 5.  Definir Tema Personalizado para Gráficos (ggplot2)
 
-```{r, warning=FALSE,echo=FALSE,message=FALSE}
+```{r, warning=FALSE,echo=FALSE,message=FALSE, }
 tema_plot <- function(dataTime, legendavar, chave) {
   
   # Criar gráfico básico de linha com o tema minimalista
   plot <- ggplot(data = dataTime, aes(x = tempo, y = x, group = 1)) +
             geom_line(color = "#3586ff", size = 1.2) +  # Linha na cor verde-escura
-            geom_label(aes(label = label), size = 3, color = "#3586ff", nudge_y = 0.5) +  # Rótulos em verde-escuro
+            geom_label(aes(label = label), size = 3, color = "#3586ff", nudge_y = 0.5) +  # Cor do Rótulos
             labs(
               title = "Evolução Temporal de Rondonópolis (MT)",
               subtitle = legendavar,
@@ -546,7 +544,7 @@ Até 2030, alcançar o acesso universal e equitativo a água potável e segura p
 
 Para município de Rondonópolis é possível analisar a série histórica de abastecimento de água entre 1999 a 2022, conforme ilustrado no gráfico a seguir. Os dados mostram um aumento de habitantes atendidos ao longo dos anos e durante um período de 10 anos a população obeteve acesso a abastecimento de água crescente de 190.750 habitantes em 2010 para 244.911 habitantes em 2022, indicando uma evolução positiva no alcance dos serviços de água.
 
-```{r, warning=FALSE,echo=FALSE,message=FALSE}
+```{r, warning=FALSE,echo=FALSE,message=FALSE, fig.align='center', fig.width=9}
 dev01(san_roo, san_roo$Pop_total_atendida_abas_agua, 'media','Pop. total com Abastecimento de Água (Habitantes)')
 ```
 
@@ -621,7 +619,7 @@ meta61 <- san_bas %>%
     Pop_rural_atendida_pct = (Pop_rural_atendida_abas_agua / Populacao) * 100)
 ```
 
-```{r, warning=FALSE,echo=FALSE,message=FALSE}
+```{r, warning=FALSE,echo=FALSE,message=FALSE, fig.width=9}
 # gráfico de barras
 grafico_barras <- meta61 %>%
   ggplot(aes(x = Ano)) +
@@ -671,7 +669,7 @@ ggsave(
   dpi = 300)
 ```
 
-Inicialemnte, é possivel verificar que em 2021 de 100% da população total 96,19% da população urbana foi atendida com abastecimento de água. A 
+Inicialemnte, é possivel verificar que em 2021 de 100% da população total 96,19% da população urbana foi atendida com abastecimento de água.
 
 # Meta 6.2 - Acesso a Saneamento e Higiene Adequados até 2030
 
@@ -693,7 +691,7 @@ ES002 - Quantidade de ligações ativas de esgotos: Embora não forneça diretam
 
 A fórmula para calcular a proporção de população com acesso a esgoto tratado é:
 
-No código abaixo, são realizadas as operações para calcular essa proporção:
+(espaço para a fórmula usada)
 
 ```{r, warning=FALSE,echo=FALSE,message=FALSE}
 # Filtrar os dados para o intervalo de anos e selecionar as colunas desejadas
@@ -722,7 +720,7 @@ san_meta621a <- san_meta62a %>%
     Pop_urbana_atendida_esgotamento_sanitario_pct = (Pop_urbana_atendida_esgotamento_sanitario / Populacao) * 100)
 ```
 
-```{r, warning=FALSE,echo=FALSE,message=FALSE}
+```{r, warning=FALSE,echo=FALSE,message=FALSE,fig.width=9}
 grafico_barras <- san_meta621a %>%
   ggplot(aes(x = Ano)) +
   # Barra para a população total atendida por esgoto sanitário
@@ -785,7 +783,7 @@ Cálculo da Razão de Tratamento: Calcule a proporção do volume tratado em rel
 
 (ES006/ES005)×100% para cada período e/ou região, o que evidencia a eficiência do sistema de tratamento.
 
-```{r, warning=FALSE,echo=FALSE,message=FALSE}
+```{r, warning=FALSE,echo=FALSE,message=FALSE, fig.width=9}
 dev01(san_roo, san_roo$Volume_esgoto_coletado_m3, 'media','Volume Esgoto Coletado (m³)')
 dev01(san_roo, san_roo$Volume_esgoto_tratado, 'media', 'Volume Esgoto Tratado (m³)')
 
