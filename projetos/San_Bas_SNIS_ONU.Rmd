@@ -1,14 +1,13 @@
 ---
-title: "Avaliação dos Avanços de Rondonópolis (MT) em Relação ao Objetivo de Desenvolvimento Sustentável 6 (ODS 6) – Água Potável e Saneamento"
+title: Avaliação dos Avanços de Rondonópolis (MT) em Relação ao Objetivo de Desenvolvimento
+  Sustentável 6 (ODS 6) – Água Potável e Saneamento
 author: "Camily Nunes dos Santos"
 date: "`r format(Sys.Date(), '%d de %B de %Y')`"
-output: 
-  html_document:
-    css: "estilo.css"
-    code_folding: hide
+output:
   pdf_document: default
-params:
-  exemplo_param: "Exemplo"
+  html_document:
+    css: estilo.css
+always_allow_html: true
 ---
 
 ::: {style="display: flex; justify-content: space-between; width: 50%; padding: 10px;"}
@@ -320,10 +319,14 @@ gg <- ggplot(plot_data, aes(x = Proporcao,
     panel.grid.minor = element_blank())  
 
 # Salvar o gráfico em um arquivo PNG
+if (!dir.exists("graficos")) {
+  dir.create("graficos")
+}
+
 ggsave(
   filename = 'grafico_proporcao_omissos.png', 
   plot = gg, 
-  path = 'resultados',
+  path = 'graficos',
   width = 8,
   height = 4,
   units = 'in')
@@ -391,7 +394,7 @@ gg <- ggplot(plot_data, aes(x = Ano,
 ggsave(
   filename = "grafico_omissos_por_variavel_ano.png",
   plot = gg,
-  path = "resultados",
+  path = "graficos",
   width = 12,  # largura
   height = 14, # altura
   units = "in")
@@ -488,7 +491,7 @@ tema_plot <- function(dataTime, legendavar, chave) {
   ggsave(
     filename = paste0('grafico_', cleanStr(legendavar), '.png'), 
     plot = plot, 
-    path = 'resultados',
+    path = 'graficos',
     width = 8,
     height = 4,
     units = 'in')
@@ -660,7 +663,8 @@ grafico_interativo
 # Salvar o gráfico como JPG na pasta "resultados"
 ggsave(
   filename = "resultados/grafico_pop_atendida.jpg", 
-  plot = grafico_barras, 
+  plot = grafico_barras,
+  path = 'graficos',
   width = 10, 
   height = 6, 
   units = "in", 
@@ -751,6 +755,7 @@ grafico_interativo
 ggsave(
   filename = "resultados/grafico_pop_atendida_esgoto.jpg", 
   plot = grafico_barras, 
+  path = 'graficos',
   width = 10, 
   height = 6, 
   units = "in", 

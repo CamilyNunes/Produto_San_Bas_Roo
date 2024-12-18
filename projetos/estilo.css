@@ -1,0 +1,187 @@
+/* Configurações gerais para o corpo do texto */
+body {
+  font-size: 12pt; /* Texto principal conforme ABNT */
+  line-height: 1.5; /* Espaçamento entre linhas conforme ABNT */
+  margin: 2cm 3cm; /* Margens recomendadas pela ABNT */
+  background-color: #f9f9f9; /* Fundo suave para leitura confortável */
+  font-family: 'Poppins', sans-serif; /* Fonte moderna */
+  color: #333; /* Cor do texto */
+}
+
+/* Títulos com tamanhos e espaçamentos consistentes */
+h1 {
+  font-size: 20pt; /* Título principal conforme ABNT */
+  font-weight: bold;
+  text-align: center; /* Centralizado para layout profissional */
+}
+
+h2 {
+  font-size: 16pt; /* Subtítulos */
+  font-weight: bold;
+  margin-top: 20px;
+  text-transform: uppercase; /* Estilo moderno */
+}
+
+h3 {
+  font-size: 14pt; /* Títulos menores */
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+/* Ajustes para parágrafos */
+p {
+  text-align: justify; /* Justificado conforme ABNT */
+  margin-bottom: 12px; /* Espaçamento entre parágrafos */
+}
+
+/* Estilo para imagens */
+img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0; /* Espaçamento acima e abaixo */
+}
+
+/* Tabelas com estilo moderno */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table th, table td {
+  border: 1px solid #ddd; /* Bordas finas e suaves */
+  text-align: left; /* Texto alinhado à esquerda */
+  padding: 10px; /* Espaçamento interno */
+}
+
+table thead {
+  background-color: #f2f2f2; /* Cabeçalho com fundo claro */
+  font-weight: bold;
+}
+
+/* Rodapé personalizado */
+.custom-footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 12pt;
+  background-color: #4f9cf9; /* Cor moderna para destaque */
+  color: #fff;
+  margin-top: 40px;
+  border-top: 1px solid #ccc;
+}
+
+.custom-footer p {
+  margin: 0;
+}
+
+.custom-footer img {
+  width: 100px; /* Tamanho do logotipo no rodapé */
+  margin-top: 10px;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+  body {
+    font-size: 10pt; /* Texto menor para dispositivos móveis */
+    margin: 1cm 2cm;
+  }
+
+  h1 {
+    font-size: 18pt;
+  }
+
+  h2 {
+    font-size: 14pt;
+  }
+
+  h3 {
+    font-size: 12pt;
+  }
+
+  .custom-footer {
+    font-size: 10pt;
+  }
+}
+
+/* Contêiner para gráficos */
+.plot-container {
+  max-width: 100%; /* Adapta o tamanho ao layout */
+  margin: 20px auto; /* Centraliza o gráfico horizontalmente */
+  text-align: center; /* Centraliza conteúdo interno (se necessário) */
+  padding: 15px; /* Espaçamento interno para destaque */
+  background-color: #fff; /* Fundo branco para contraste */
+  border: 1px solid #ccc; /* Bordas leves */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+/* Estilos para o Rodapé */
+footer {
+    position: relative;
+    width: 100%;
+    background: #3586ff;
+    min-height: 100px;
+    padding: 20px 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+footer .waves {
+    position: absolute;
+    top: -100px; /* Ajusta a posição para ficar sobre o rodapé */
+    left: 0;
+    width: 100%;
+    height: 100px; /* Altura das ondas */
+    overflow: hidden;
+    line-height: 0;
+}
+
+footer .waves .wave {
+    position: absolute;
+    top: 0;
+    width: 200%; /* Onda se repete para suavidade */
+    height: 100px;
+    background: url('image/wave.png'); /* Substitua pelo caminho da imagem */
+    background-size: 50% 100px; /* Ajuste o tamanho das ondas */
+}
+
+@keyframes animateWave {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+footer .wave {
+    animation: animateWave 4s linear infinite; /* Animação contínua */
+}
+
+footer #wave1 {
+    z-index: 1000;
+    opacity: 1;
+    animation-duration: 4s;
+}
+
+footer #wave2 {
+    z-index: 999;
+    opacity: 0.5;
+    bottom: 10px;
+    animation-duration: 6s;
+}
+
+footer #wave3 {
+    z-index: 998;
+    opacity: 0.2;
+    bottom: 15px;
+    animation-duration: 8s;
+}
+
+footer #wave4 {
+    z-index: 997;
+    opacity: 0.7;
+    bottom: 20px;
+    animation-duration: 10s;
+}
